@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enchères — Mercato Nova</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #1a1a1a; }
+
+    /* ── HEADER ── */
+    header {
+      background: #fff; border-bottom: 1px solid #e0e0e0;
+      padding: 0 32px; height: 56px;
+      display: flex; align-items: center; gap: 24px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 8px; font-size: 1.3rem; font-weight: 800; letter-spacing: 0.5px; color: #1a1a1a; text-decoration: none; white-space: nowrap; }
+    .logo span { font-size: 1.4rem; }
+    .search-bar { flex: 1; max-width: 380px; margin-left: auto; position: relative; }
+    .search-bar input { width: 100%; padding: 8px 14px 8px 36px; border: 1px solid #ddd; border-radius: 20px; background: #f2f2f2; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+    .search-bar input:focus { border-color: #a0a0a0; background: #fff; }
+    .search-bar .icon-search { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #888; font-size: 0.9rem; }
+    nav { display: flex; align-items: center; gap: 4px; }
+    nav a { text-decoration: none; color: #1a1a1a; font-size: 0.95rem; font-weight: 500; padding: 6px 12px; border-radius: 6px; transition: background 0.15s; }
+    nav a:hover { background: #f0f0f0; }
+    nav a.active { font-weight: 700; background: #f0f0f0; }
+    .nav-icons { display: flex; align-items: center; gap: 2px; }
+    .nav-icon { position: relative; background: none; border: none; cursor: pointer; padding: 8px; border-radius: 50%; font-size: 1.1rem; color: #1a1a1a; transition: background 0.15s; display: flex; align-items: center; }
+    .nav-icon:hover { background: #f0f0f0; }
+    .badge { position: absolute; top: 4px; right: 4px; background: #e53e3e; color: #fff; font-size: 0.6rem; font-weight: 700; border-radius: 999px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
+    .notif-trigger { position: relative; }
+    .notif-panel { position: absolute; top: 52px; right: 0; width: 300px; background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,0.12); display: none; z-index: 200; overflow: hidden; }
+    .notif-panel.open { display: block; }
+    .notif-header { padding: 12px 16px; font-weight: 700; border-bottom: 1px solid #f0f0f0; font-size: 0.95rem; }
+    .notif-item { display: flex; gap: 10px; padding: 10px 16px; border-bottom: 1px solid #f8f8f8; font-size: 0.84rem; align-items: flex-start; transition: background 0.1s; }
+    .notif-item:hover { background: #fafafa; }
+    .notif-item .icon { font-size: 1.1rem; margin-top: 1px; }
+    .notif-item p { line-height: 1.4; }
+    .notif-item small { color: #888; }
+    .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; margin-top: 5px; flex-shrink: 0; }
+
+    /* ── HERO ── */
+    .hero {
+      background: #1a1a1a;
+      color: #fff;
+      padding: 36px 32px;
+      text-align: center;
+    }
+    .hero-title { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+    .hero-sub { font-size: 1rem; color: #aaa; margin-bottom: 20px; }
+    .hero-stats {
+      display: inline-flex;
+      gap: 32px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 14px 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat-val { font-size: 1.5rem; font-weight: 800; color: #f59e0b; }
+    .hero-stat-lbl { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.4px; }
+
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      padding: 18px 32px;
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .how-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: #555;
+    }
+    .how-step .how-icon { font-size: 1.1rem; }
+    .how-step strong { color: #1a1a1a; }
+
+    /* ── MAIN ── */
+    .page-wrapper { max-width: 1100px; margin: 0 auto; padding: 28px 16px 60px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .section-title { font-size: 1.2rem; font-weight: 800; }
+    .section-count { font-size: 0.85rem; color: #888; }
+
+    .sort-select { padding: 7px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.88rem; background: #fff; cursor: pointer; outline: none; color: #1a1a1a; }
+
+    /* ── GRID ── */
+    .enchere-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 860px) { .enchere-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .enchere-grid { grid-template-columns: 1fr; } }
+
+    /* ── CARD ── */
+    .card {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.15s;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.11); transform: translateY(-2px); }
+
+    .card-img-wrapper { width: 100%; aspect-ratio: 4/3; overflow: hidden; }
+    .card-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
+    .card:hover .card-img { transform: scale(1.04); }
+
+    .card-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .card-name { font-size: 0.95rem; font-weight: 700; line-height: 1.3; }
+    .card-sub { font-size: 0.8rem; color: #888; }
+
+    /* Timer */
+    .card-timer-bar {
+      background: #fff8ec;
+      border: 1.5px solid #f59e0b;
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-timer { font-size: 0.88rem; font-weight: 700; color: #92400e; }
+    .card-timer-label { font-size: 0.72rem; color: #aaa; text-transform: uppercase; }
+
+    /* Bid */
+    .card-bid-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+    .card-bid { font-size: 1.1rem; font-weight: 800; color: #1a1a1a; }
+    .card-bid-count { font-size: 0.78rem; color: #888; }
+
+    /* Progress bar */
+    .card-progress { height: 4px; background: #f0f0f0; border-radius: 2px; overflow: hidden; }
+    .card-progress-fill { height: 100%; background: #f59e0b; border-radius: 2px; transition: width 0.3s; }
+
+    .btn-bid-card {
+      width: 100%;
+      padding: 9px;
+      background: #f59e0b;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: auto;
+      transition: opacity 0.15s;
+    }
+    .btn-bid-card:hover { opacity: 0.85; }
+    .btn-bid-card.ended { background: #d1d5db; color: #6b7280; cursor: default; }
+
+    /* Urgency */
+    .urgent { border-color: #e53e3e !important; background: #fff5f5 !important; }
+    .urgent .card-timer { color: #e53e3e !important; }
+
+    /* Empty */
+    .empty-state { text-align: center; padding: 60px 20px; color: #aaa; grid-column: 1/-1; }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+    /* ── TOAST ── */
+    .toast { position: fixed; bottom: 28px; right: 28px; background: #1a1a1a; color: #fff; padding: 12px 22px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; opacity: 0; transform: translateY(12px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 999; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <a class="logo" href="Index_mercato_nova.html"><span>♪</span> MERCATO NOVA</a>
+  <div class="search-bar">
+    <span class="icon-search">🔍</span>
+    <input type="text" id="searchInput" placeholder="Rechercher une enchère..." oninput="renderCards()" />
+  </div>
+  <nav>
+    <a href="Index_mercato_nova.html">Accueil</a>
+    <a href="catalogue.html">Catalogue</a>
+    <a href="encheres.html" class="active">Enchères</a>
+    <a href="creation_annonce.html">Mes annonces</a>
+  </nav>
+  <div class="nav-icons">
+    <div class="notif-trigger">
+      <button class="nav-icon" onclick="toggleNotif()" title="Notifications">
+        🔔<span class="badge">3</span>
+      </button>
+      <div class="notif-panel" id="notifPanel">
+        <div class="notif-header">Notifications</div>
+        <div class="notif-item">
+          <span class="icon">🔨</span>
+          <div><p>Vous avez été surenchéri sur <strong>Platine Technics SL-1200</strong></p><small>Il y a 5 min</small></div>
+          <span class="notif-dot"></span>
+        </div>
+        <div class="notif-item">
+          <span class="icon">💬</span>
+          <div><p>Contre-offre reçue sur <strong>Casque Sennheiser HD600</strong></p><small>Il y a 1h</small></div>
+          <span class="notif-dot"></span>
+        </div>
+        <div class="notif-item">
+          <span class="icon">✅</span>
+          <div><p>Votre achat <strong>Daft Punk — RAM</strong> a été confirmé</p><small>Hier</small></div>
+          <span class="notif-dot"></span>
+        </div>
+      </div>
+    </div>
+    <button class="nav-icon" onclick="window.location.href='panier.html'" title="Panier">
+      🛒<span class="badge" id="cartBadge" style="display:none">0</span>
+    </button>
+    <button class="nav-icon" onclick="goToProfile()" title="Mon compte">👤</button>
+  </div>
+</header>
+
+<!-- ══ HERO ══ -->
+<div class="hero">
+  <div class="hero-title">🔨 Enchères en cours</div>
+  <div class="hero-sub">Enchérissez en temps réel et remportez des articles uniques</div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-val" id="statCount">0</div>
+      <div class="hero-stat-lbl">Enchères actives</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val" id="statAvg">—</div>
+      <div class="hero-stat-lbl">Prix moyen</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val" id="statUrgent">0</div>
+      <div class="hero-stat-lbl">Se terminent &lt; 1h</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOW IT WORKS ══ -->
+<div class="how-section">
+  <div class="how-step"><span class="how-icon">👁️</span> <div><strong>Consultez</strong> les enchères en cours</div></div>
+  <div class="how-step"><span class="how-icon">💰</span> <div><strong>Proposez</strong> votre mise</div></div>
+  <div class="how-step"><span class="how-icon">⏱️</span> <div><strong>Suivez</strong> le décompte en direct</div></div>
+  <div class="how-step"><span class="how-icon">🏆</span> <div><strong>Remportez</strong> l'article si vous êtes le plus offrant</div></div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="page-wrapper">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Toutes les enchères</div>
+      <div class="section-count" id="resultCount">0 enchère</div>
+    </div>
+    <select class="sort-select" id="sortSelect" onchange="renderCards()">
+      <option value="urgent">Se terminent bientôt</option>
+      <option value="price-asc">Prix croissant</option>
+      <option value="price-desc">Prix décroissant</option>
+      <option value="name">Nom A → Z</option>
+    </select>
+  </div>
+
+  <div class="enchere-grid" id="enchereGrid"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ═══════════════════════════
+     DONNÉES
+  ═══════════════════════════ */
+  const PRODUCTS = [
+    { id:1,  name:"Abbey Road — Beatles",       img:"Abbey_Road.jpeg",               bg:"#e8d5b7", price:85,  cat:"Vinyle",  genre:"Rock",  etat:"Excellent", timer:"02:14:30", bidCount:4 },
+    { id:4,  name:"Kind of Blue — Miles Davis",  img:"kind-of-blue.jpeg",             bg:"#c8daf0", price:45,  cat:"Vinyle",  genre:"Jazz",  etat:"Bon état",  timer:"05:00:00", bidCount:2 },
+    { id:7,  name:"Ampli Marantz 2270",          img:"marantz-2270.jpg",              bg:"#e0d0c0", price:550, cat:"Ampli",   genre:null,    etat:"Bon état",  timer:"01:20:00", bidCount:7 },
+    { id:10, name:"Kind of Blue — 1ère press.",  img:"kind-of-blue.jpeg",             bg:"#d0e0f0", price:210, cat:"Vinyle",  genre:"Jazz",  etat:"Excellent", timer:"03:30:00", bidCount:5 },
+  ];
+
+  /* ═══════════════════════════
+     TIMERS
+  ═══════════════════════════ */
+  const timerState = {};
+  PRODUCTS.forEach(p => {
+    const [h, m, s] = p.timer.split(':').map(Number);
+    timerState[p.id] = h * 3600 + m * 60 + s;
+  });
+
+  function formatTime(secs) {
+    if (secs <= 0) return 'Terminée';
+    const h = String(Math.floor(secs / 3600)).padStart(2, '0');
+    const m = String(Math.floor((secs % 3600) / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  }
+
+  setInterval(() => {
+    Object.keys(timerState).forEach(id => {
+      timerState[id] = Math.max(0, timerState[id] - 1);
+    });
+    document.querySelectorAll('[data-timer]').forEach(el => {
+      const id = Number(el.dataset.timer);
+      const secs = timerState[id];
+      el.textContent = formatTime(secs);
+      const bar = el.closest('.card-timer-bar');
+      if (bar) {
+        bar.classList.toggle('urgent', secs < 3600 && secs > 0);
+      }
+    });
+    updateStats();
+  }, 1000);
+
+  /* ═══════════════════════════
+     STATS
+  ═══════════════════════════ */
+  function updateStats() {
+    const active = PRODUCTS.filter(p => timerState[p.id] > 0);
+    document.getElementById('statCount').textContent = active.length;
+    if (active.length) {
+      const avg = Math.round(active.reduce((s, p) => s + p.price, 0) / active.length);
+      document.getElementById('statAvg').textContent = avg + ' €';
+    }
+    document.getElementById('statUrgent').textContent = active.filter(p => timerState[p.id] < 3600).length;
+  }
+
+  /* ═══════════════════════════
+     RENDER
+  ═══════════════════════════ */
+  function getFiltered() {
+    const search = document.getElementById('searchInput').value.toLowerCase().trim();
+    const sort   = document.getElementById('sortSelect').value;
+
+    let list = PRODUCTS.filter(p => !search || p.name.toLowerCase().includes(search));
+
+    if (sort === 'urgent')     list.sort((a, b) => timerState[a.id] - timerState[b.id]);
+    if (sort === 'price-asc')  list.sort((a, b) => a.price - b.price);
+    if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
+    if (sort === 'name')       list.sort((a, b) => a.name.localeCompare(b.name));
+
+    return list;
+  }
+
+  function renderCards() {
+    const grid = document.getElementById('enchereGrid');
+    const list = getFiltered();
+    const n = list.length;
+    document.getElementById('resultCount').textContent = `${n} enchère${n !== 1 ? 's' : ''}`;
+
+    if (!n) {
+      grid.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>Aucune enchère ne correspond à votre recherche.</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = list.map(p => {
+      const secs = timerState[p.id];
+      const ended = secs <= 0;
+      const urgent = !ended && secs < 3600;
+      const progress = Math.min(100, Math.round((1 - secs / (6 * 3600)) * 100));
+
+      return `
+        <div class="card" onclick="window.location.href='article.html?id=${p.id}'">
+          <div class="card-img-wrapper" style="background:${p.bg}">
+            <img class="card-img" src="${p.img}" alt="${p.name}" onerror="this.style.display='none'" />
+          </div>
+          <div class="card-body">
+            <div class="card-name">${p.name}</div>
+            <div class="card-sub">${[p.cat, p.genre, p.etat].filter(Boolean).join(' · ')}</div>
+
+            <div class="card-timer-bar ${urgent ? 'urgent' : ''}">
+              <div>
+                <div class="card-timer-label">Temps restant</div>
+                <div class="card-timer" data-timer="${p.id}">${formatTime(secs)}</div>
+              </div>
+              <span style="font-size:1.1rem">${ended ? '🏁' : urgent ? '🔥' : '⏱️'}</span>
+            </div>
+
+            <div class="card-bid-row">
+              <div class="card-bid">${p.price} €</div>
+              <div class="card-bid-count">${p.bidCount} mise${p.bidCount > 1 ? 's' : ''}</div>
+            </div>
+
+            <div class="card-progress">
+              <div class="card-progress-fill" style="width:${progress}%"></div>
+            </div>
+
+            <button class="btn-bid-card ${ended ? 'ended' : ''}" onclick="event.stopPropagation(); ${ended ? "showToast('Cette enchère est terminée.')" : `window.location.href='article.html?id=${p.id}'`}">
+              ${ended ? 'Enchère terminée' : 'Enchérir maintenant →'}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    updateStats();
+  }
+
+  /* ═══════════════════════════
+     CART BADGE
+  ═══════════════════════════ */
+  function updateCartBadge() {
+    const cart = JSON.parse(localStorage.getItem('mn_cart') || '[]');
+    const total = cart.reduce((s, i) => s + i.qty, 0);
+    const badge = document.getElementById('cartBadge');
+    badge.textContent = total;
+    badge.style.display = total > 0 ? 'flex' : 'none';
+  }
+
+  /* ═══════════════════════════
+     NAV
+  ═══════════════════════════ */
+  function goToProfile() {
+    window.location.href = 'Creationprofile.html';
+  }
+
+  function toggleNotif() {
+    document.getElementById('notifPanel').classList.toggle('open');
+  }
+  document.addEventListener('click', e => {
+    const t = document.querySelector('.notif-trigger');
+    if (t && !t.contains(e.target)) document.getElementById('notifPanel').classList.remove('open');
+  });
+
+  /* ═══════════════════════════
+     TOAST
+  ═══════════════════════════ */
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  /* ── INIT ── */
+  renderCards();
+  updateCartBadge();
+</script>
+
+</body>
+</html>
