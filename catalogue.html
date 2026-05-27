@@ -476,7 +476,8 @@
   <nav>
     <a href="Index_mercato_nova.html">Accueil</a>
     <a href="catalogue.html" class="active">Catalogue</a>
-    <a href="#">Enchères</a>
+    <a href="encheres.html">Enchères</a>
+    <a href="creation_annonce.html">Mes annonces</a>
   </nav>
 
   <div class="nav-icons">
@@ -514,12 +515,12 @@
       </div>
     </div>
 
-    <button class="nav-icon" title="Panier">
+    <button class="nav-icon" onclick="window.location.href='panier.html'" title="Panier">
       🛒
       <span class="badge">1</span>
     </button>
 
-    <button class="nav-icon" title="Mon compte">
+    <button class="nav-icon" onclick="goToProfile()" title="Mon compte">
       👤
     </button>
   </div>
@@ -826,13 +827,12 @@
 
   /* ── ACTIONS ── */
   function openProduct(id) {
-    alert(`Fiche produit #${id} — à venir`);
+    window.location.href = `article.html?id=${id}`;
   }
 
   function actionClick(e, id, type) {
     e.stopPropagation();
-    const label = type === "nego" ? "Négocier" : type === "enchere" ? "Placer une enchère sur" : "Acheter";
-    alert(`${label} le produit #${id} — à venir`);
+    window.location.href = `article.html?id=${id}`;
   }
 
   /* ── PRICE DISPLAY ── */
@@ -854,6 +854,10 @@
   /* ── NOTIFICATIONS ── */
   function toggleNotif() {
     document.getElementById("notifPanel").classList.toggle("open");
+  }
+
+  function goToProfile() {
+    window.location.href = 'Creationprofile.html';
   }
 
   document.addEventListener("click", function(e) {
