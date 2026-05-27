@@ -548,11 +548,22 @@
     <div class="filter-group">
       <div class="filter-title">Genre musical</div>
       <ul class="filter-list">
-        <li><label><input type="checkbox" value="Rock" onchange="applyFilters()"> Rock</label></li>
-        <li><label><input type="checkbox" value="Jazz" onchange="applyFilters()"> Jazz</label></li>
-        <li><label><input type="checkbox" value="Electro" onchange="applyFilters()"> Electro</label></li>
-        <li><label><input type="checkbox" value="Classique" onchange="applyFilters()"> Classique</label></li>
-        <li><label><input type="checkbox" value="Hip-Hop" onchange="applyFilters()"> Hip-Hop</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Rock" onchange="applyFilters()"> Rock</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Jazz" onchange="applyFilters()"> Jazz</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Electro" onchange="applyFilters()"> Electro</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Classique" onchange="applyFilters()"> Classique</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Hip-Hop" onchange="applyFilters()"> Hip-Hop</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Alternatif/Punk" onchange="applyFilters()"> Alternatif/Punk</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="R&B/Soul" onchange="applyFilters()"> R&amp;B/Soul</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Pop" onchange="applyFilters()"> Pop</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Hip-Hop/Rap" onchange="applyFilters()"> Hip-Hop/Rap</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Classical" onchange="applyFilters()"> Classical</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Country" onchange="applyFilters()"> Country</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Reggae" onchange="applyFilters()"> Reggae</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Latin" onchange="applyFilters()"> Latin</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Blues" onchange="applyFilters()"> Blues</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Soundtrack" onchange="applyFilters()"> Soundtrack</label></li>
+        <li><label><input type="checkbox" class="genre-filter" value="Metal" onchange="applyFilters()"> Metal</label></li>
       </ul>
     </div>
 
@@ -680,7 +691,7 @@
   /* ── FILTERS ── */
   function getFilters() {
     const cat = document.querySelector('input[name="cat"]:checked')?.value || "";
-    const genres = [...document.querySelectorAll('.filter-list input[type="checkbox"][value="Rock"], .filter-list input[type="checkbox"][value="Jazz"], .filter-list input[type="checkbox"][value="Electro"], .filter-list input[type="checkbox"][value="Classique"], .filter-list input[type="checkbox"][value="Hip-Hop"]')]
+    const genres = [...document.querySelectorAll('.filter-list input.genre-filter')]
       .filter(cb => cb.checked).map(cb => cb.value);
     const etats = [...document.querySelectorAll('.filter-list input[type="checkbox"][value="Neuf / Scellé"], .filter-list input[type="checkbox"][value="Excellent"], .filter-list input[type="checkbox"][value="Bon état"], .filter-list input[type="checkbox"][value="Correct"]')]
       .filter(cb => cb.checked).map(cb => cb.value);
