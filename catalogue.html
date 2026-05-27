@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catalogue — Mercato Nova</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #1a1a1a;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .logo span { font-size: 1.4rem; }
+
+    .search-bar {
+      flex: 1;
+      max-width: 380px;
+      margin-left: auto;
+      position: relative;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 8px 14px 8px 36px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      background: #f2f2f2;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar input:focus { border-color: #a0a0a0; background: #fff; }
+
+    .search-bar .icon-search {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    nav { display: flex; align-items: center; gap: 4px; }
+
+    nav a {
+      text-decoration: none;
+      color: #1a1a1a;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+
+    nav a:hover { background: #f0f0f0; }
+    nav a.active { font-weight: 700; background: #f0f0f0; }
+
+    .nav-icons { display: flex; align-items: center; gap: 2px; }
+
+    .nav-icon {
+      position: relative;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      color: #1a1a1a;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-icon:hover { background: #f0f0f0; }
+
+    .badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: #e53e3e;
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      border-radius: 999px;
+      min-width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+    }
+
+    .notif-trigger { position: relative; }
+
+    .notif-panel {
+      position: absolute;
+      top: 52px;
+      right: 0;
+      width: 300px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+      display: none;
+      z-index: 200;
+      overflow: hidden;
+    }
+
+    .notif-panel.open { display: block; }
+
+    .notif-header {
+      padding: 12px 16px;
+      font-weight: 700;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.95rem;
+    }
+
+    .notif-item {
+      display: flex;
+      gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #f8f8f8;
+      font-size: 0.84rem;
+      align-items: flex-start;
+      transition: background 0.1s;
+    }
+
+    .notif-item:hover { background: #fafafa; }
+    .notif-item .icon { font-size: 1.1rem; margin-top: 1px; }
+    .notif-item p { line-height: 1.4; }
+    .notif-item small { color: #888; }
+    .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; margin-top: 5px; flex-shrink: 0; }
+
+    /* ── LAYOUT ── */
+    .page-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 16px 48px;
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      font-size: 0.83rem;
+      color: #888;
+      margin-bottom: 20px;
+      grid-column: 1 / -1;
+    }
+
+    .breadcrumb a { color: #888; text-decoration: none; }
+    .breadcrumb a:hover { color: #1a1a1a; text-decoration: underline; }
+    .breadcrumb span { color: #1a1a1a; font-weight: 500; }
+
+    /* ── SIDEBAR ── */
+    aside {
+      width: 200px;
+      flex-shrink: 0;
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 12px;
+      padding: 18px 16px;
+    }
+
+    .filter-group { margin-bottom: 18px; }
+
+    .filter-group:last-of-type { margin-bottom: 0; }
+
+    .filter-title {
+      font-size: 0.83rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .filter-list { list-style: none; }
+
+    .filter-list li {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 3px 0;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.1s;
+    }
+
+    .filter-list li:hover { background: #f5f5f5; padding-left: 4px; }
+
+    .filter-list input[type="checkbox"] {
+      accent-color: #1a1a1a;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+    }
+
+    /* Prix slider */
+    .price-range {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .price-range input[type="range"] {
+      width: 100%;
+      accent-color: #1a1a1a;
+      cursor: pointer;
+    }
+
+    .price-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    .price-display {
+      font-size: 0.82rem;
+      color: #888;
+      text-align: center;
+    }
+
+    .btn-reset {
+      width: 100%;
+      margin-top: 20px;
+      padding: 8px;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn-reset:hover { background: #f5f5f5; border-color: #aaa; }
+
+    /* ── MAIN CONTENT ── */
+    .catalogue-main { flex: 1; min-width: 0; }
+
+    .catalogue-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .catalogue-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .catalogue-title span {
+      font-weight: 400;
+      color: #888;
+    }
+
+    .sort-select {
+      padding: 7px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      background: #fff;
+      cursor: pointer;
+      outline: none;
+      color: #1a1a1a;
+    }
+
+    .sort-select:focus { border-color: #aaa; }
+
+    /* ── ACTIVE FILTERS TAGS ── */
+    .active-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .filter-tag {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px 3px 10px;
+      background: #1a1a1a;
+      color: #fff;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .filter-tag button {
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.85rem;
+      line-height: 1;
+      padding: 0;
+      margin-left: 2px;
+    }
+
+    /* ── PRODUCT GRID ── */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .product-grid { grid-template-columns: 1fr; } }
+
+    /* ── CARD ── */
+    .card {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+      transform: translateY(-2px);
+    }
+
+    .card-img-wrapper {
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s;
+    }
+
+    .card:hover .card-img { transform: scale(1.04); }
+
+    .card-body { padding: 12px 14px 14px; }
+
+    .card-name {
+      font-size: 0.92rem;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+
+    .card-price {
+      font-size: 0.88rem;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .card-price strong { color: #1a1a1a; }
+
+    .card-timer {
+      font-size: 0.78rem;
+      color: #e53e3e;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn-enchere { background: #f59e0b; color: #fff; }
+    .btn-nego    { background: #22c55e; color: #fff; }
+    .btn-achat   { background: #e5e7eb; color: #374151; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+    }
+
+    .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .empty-state p { font-size: 1rem; }
+
+    /* ── PAGINATION ── */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .page-btn {
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+      color: #1a1a1a;
+      font-family: inherit;
+    }
+
+    .page-btn:hover:not(:disabled) { background: #f0f0f0; border-color: #bbb; }
+    .page-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; font-weight: 700; }
+    .page-btn:disabled { opacity: 0.35; cursor: default; }
+    .page-sep { color: #bbb; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <a class="logo" href="Index_mercato_nova.html">
+    <span>♪</span> MERCATO NOVA
+  </a>
+
+  <div class="search-bar">
+    <span class="icon-search">🔍</span>
+    <input type="text" id="searchInput" placeholder="Rechercher..." oninput="applyFilters()" />
+  </div>
+
+  <nav>
+    <a href="Index_mercato_nova.html">Accueil</a>
+    <a href="catalogue.html" class="active">Catalogue</a>
+    <a href="#">Enchères</a>
+  </nav>
+
+  <div class="nav-icons">
+    <div class="notif-trigger">
+      <button class="nav-icon" onclick="toggleNotif()" title="Notifications">
+        🔔
+        <span class="badge" id="notifBadge">3</span>
+      </button>
+      <div class="notif-panel" id="notifPanel">
+        <div class="notif-header">Notifications</div>
+        <div class="notif-item">
+          <span class="icon">🔨</span>
+          <div>
+            <p>Vous avez été surenchéri sur <strong>Platine Technics SL-1200</strong></p>
+            <small>Il y a 5 min</small>
+          </div>
+          <span class="notif-dot"></span>
+        </div>
+        <div class="notif-item">
+          <span class="icon">💬</span>
+          <div>
+            <p>Contre-offre reçue sur <strong>Casque Sennheiser HD600</strong></p>
+            <small>Il y a 1h</small>
+          </div>
+          <span class="notif-dot"></span>
+        </div>
+        <div class="notif-item">
+          <span class="icon">✅</span>
+          <div>
+            <p>Votre achat <strong>Daft Punk — RAM</strong> a été confirmé</p>
+            <small>Hier</small>
+          </div>
+          <span class="notif-dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <button class="nav-icon" title="Panier">
+      🛒
+      <span class="badge">1</span>
+    </button>
+
+    <button class="nav-icon" title="Mon compte">
+      👤
+    </button>
+  </div>
+</header>
+
+<!-- ══ PAGE ══ -->
+<div class="page-wrapper">
+
+  <!-- ── SIDEBAR FILTRES ── -->
+  <aside>
+    <div class="filter-group">
+      <div class="filter-title">Catégorie</div>
+      <ul class="filter-list" id="filterCategorie">
+        <li><label><input type="radio" name="cat" value="" checked onchange="applyFilters()"> Tous</label></li>
+        <li><label><input type="radio" name="cat" value="Vinyle" onchange="applyFilters()"> Vinyles</label></li>
+        <li><label><input type="radio" name="cat" value="CD" onchange="applyFilters()"> CD</label></li>
+        <li><label><input type="radio" name="cat" value="Platine" onchange="applyFilters()"> Platines</label></li>
+        <li><label><input type="radio" name="cat" value="Ampli" onchange="applyFilters()"> Amplis</label></li>
+        <li><label><input type="radio" name="cat" value="Casque" onchange="applyFilters()"> Casques</label></li>
+        <li><label><input type="radio" name="cat" value="Enceinte" onchange="applyFilters()"> Enceintes</label></li>
+        <li><label><input type="radio" name="cat" value="Accessoire" onchange="applyFilters()"> Accessoires</label></li>
+      </ul>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-title">Genre musical</div>
+      <ul class="filter-list">
+        <li><label><input type="checkbox" value="Rock" onchange="applyFilters()"> Rock</label></li>
+        <li><label><input type="checkbox" value="Jazz" onchange="applyFilters()"> Jazz</label></li>
+        <li><label><input type="checkbox" value="Electro" onchange="applyFilters()"> Electro</label></li>
+        <li><label><input type="checkbox" value="Classique" onchange="applyFilters()"> Classique</label></li>
+        <li><label><input type="checkbox" value="Hip-Hop" onchange="applyFilters()"> Hip-Hop</label></li>
+      </ul>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-title">Prix</div>
+      <div class="price-range">
+        <input type="range" id="priceRange" min="0" max="600" value="600" step="10" oninput="updatePriceDisplay(); applyFilters()">
+        <div class="price-labels">
+          <span>0 €</span>
+          <span>600 €</span>
+        </div>
+        <div class="price-display">jusqu'à <strong id="priceVal">600 €</strong></div>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-title">État</div>
+      <ul class="filter-list">
+        <li><label><input type="checkbox" value="Neuf / Scellé" onchange="applyFilters()"> Neuf / Scellé</label></li>
+        <li><label><input type="checkbox" value="Excellent" onchange="applyFilters()"> Excellent</label></li>
+        <li><label><input type="checkbox" value="Bon état" onchange="applyFilters()"> Bon état</label></li>
+        <li><label><input type="checkbox" value="Correct" onchange="applyFilters()"> Correct</label></li>
+      </ul>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-title">Type de vente</div>
+      <ul class="filter-list">
+        <li><label><input type="checkbox" value="achat" onchange="applyFilters()"> Achat immédiat</label></li>
+        <li><label><input type="checkbox" value="enchere" onchange="applyFilters()"> Enchère</label></li>
+        <li><label><input type="checkbox" value="nego" onchange="applyFilters()"> Négociable</label></li>
+      </ul>
+    </div>
+
+    <button class="btn-reset" onclick="resetFilters()">Réinitialiser</button>
+  </aside>
+
+  <!-- ── CATALOGUE ── -->
+  <div class="catalogue-main">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="Index_mercato_nova.html">Accueil</a> &rsaquo; <span>Catalogue</span>
+    </div>
+
+    <!-- Top bar -->
+    <div class="catalogue-top">
+      <h1 class="catalogue-title" id="catalogueTitle">
+        Catalogue — <span id="resultCount">0 résultats</span>
+      </h1>
+      <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+        <option value="recent">Plus récents</option>
+        <option value="price-asc">Prix croissant</option>
+        <option value="price-desc">Prix décroissant</option>
+        <option value="name-asc">Nom A → Z</option>
+      </select>
+    </div>
+
+    <!-- Active filter tags -->
+    <div class="active-filters" id="activeTags"></div>
+
+    <!-- Grid -->
+    <div class="product-grid" id="productGrid"></div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination"></div>
+
+  </div>
+</div>
+
+<script>
+  /* ── DATA ── */
+  const allProducts = [
+    { id: 1,  name: "Abbey Road — Beatles",        img: "Abbey_Road.jpeg",                  bg: "#e8d5b7", price: 85,  type: "enchere", cat: "Vinyle",    genre: "Rock",    etat: "Excellent",    timer: "02:14:30" },
+    { id: 2,  name: "Daft Punk — RAM",              img: "daft-punk-ram.jpeg",               bg: "#d5d5e8", price: 35,  type: "achat",   cat: "Vinyle",    genre: "Electro", etat: "Bon état",     timer: null },
+    { id: 3,  name: "Platine Technics SL-1200",     img: "Platine Technics SL-1200.jpeg",    bg: "#d0d0d0", price: 320, type: "nego",    cat: "Platine",   genre: null,      etat: "Excellent",    timer: null },
+    { id: 4,  name: "Kind of Blue — Miles Davis",   img: "kind-of-blue.jpeg",                bg: "#c8daf0", price: 45,  type: "enchere", cat: "Vinyle",    genre: "Jazz",    etat: "Bon état",     timer: "05:00:00" },
+    { id: 5,  name: "Casque Sennheiser HD600",      img: "sennheiser-hd600.jpg",             bg: "#d0d0d0", price: 180, type: "nego",    cat: "Casque",    genre: null,      etat: "Excellent",    timer: null },
+    { id: 6,  name: "Lot Jazz vinyles",             img: "vinyles-jazz.webp",                bg: "#fce4b0", price: 60,  type: "achat",   cat: "Vinyle",    genre: "Jazz",    etat: "Correct",      timer: null },
+    { id: 7,  name: "Ampli Marantz 2270",           img: "marantz-2270.jpg",                 bg: "#e0d0c0", price: 550, type: "enchere", cat: "Ampli",     genre: null,      etat: "Bon état",     timer: "01:20:00" },
+    { id: 8,  name: "Enceintes JBL L100",           img: "jbl-l100.png",                     bg: "#c8d8c8", price: 450, type: "achat",   cat: "Enceinte",  genre: null,      etat: "Excellent",    timer: null },
+    { id: 9,  name: "Abbey Road — édition limitée", img: "Abbey_Road.jpeg",                  bg: "#f0e8d0", price: 120, type: "nego",    cat: "Vinyle",    genre: "Rock",    etat: "Neuf / Scellé",timer: null },
+    { id: 10, name: "Kind of Blue — 1ère press.",   img: "kind-of-blue.jpeg",                bg: "#d0e0f0", price: 210, type: "enchere", cat: "Vinyle",    genre: "Jazz",    etat: "Excellent",    timer: "03:30:00" },
+    { id: 11, name: "Casque HD600 Pro",             img: "sennheiser-hd600.jpg",             bg: "#e0e0e0", price: 220, type: "achat",   cat: "Casque",    genre: null,      etat: "Neuf / Scellé",timer: null },
+    { id: 12, name: "Platine Technics — édition",   img: "Platine Technics SL-1200.jpeg",    bg: "#d8d8d8", price: 480, type: "nego",    cat: "Platine",   genre: null,      etat: "Bon état",     timer: null },
+  ];
+
+  const PER_PAGE = 6;
+  let currentPage = 1;
+  let filtered = [...allProducts];
+
+  /* ── TIMERS ── */
+  const timerState = {};
+  allProducts.forEach(p => {
+    if (p.timer) timerState[p.id] = parseTime(p.timer);
+  });
+
+  function parseTime(t) {
+    const [h, m, s] = t.split(":").map(Number);
+    return h * 3600 + m * 60 + s;
+  }
+
+  function formatTime(secs) {
+    if (secs <= 0) return "Terminée";
+    const h = String(Math.floor(secs / 3600)).padStart(2, "0");
+    const m = String(Math.floor((secs % 3600) / 60)).padStart(2, "0");
+    const s = String(secs % 60).padStart(2, "0");
+    return `${h}:${m}:${s}`;
+  }
+
+  setInterval(() => {
+    Object.keys(timerState).forEach(id => {
+      timerState[id] = Math.max(0, timerState[id] - 1);
+    });
+    document.querySelectorAll(".card-timer[data-id]").forEach(el => {
+      const id = Number(el.dataset.id);
+      if (timerState[id] !== undefined) {
+        const secs = timerState[id];
+        el.textContent = "⏱ " + formatTime(secs);
+        el.style.color = secs < 600 ? "#e53e3e" : secs < 3600 ? "#d97706" : "#888";
+      }
+    });
+  }, 1000);
+
+  /* ── FILTERS ── */
+  function getFilters() {
+    const cat = document.querySelector('input[name="cat"]:checked')?.value || "";
+    const genres = [...document.querySelectorAll('.filter-list input[type="checkbox"][value="Rock"], .filter-list input[type="checkbox"][value="Jazz"], .filter-list input[type="checkbox"][value="Electro"], .filter-list input[type="checkbox"][value="Classique"], .filter-list input[type="checkbox"][value="Hip-Hop"]')]
+      .filter(cb => cb.checked).map(cb => cb.value);
+    const etats = [...document.querySelectorAll('.filter-list input[type="checkbox"][value="Neuf / Scellé"], .filter-list input[type="checkbox"][value="Excellent"], .filter-list input[type="checkbox"][value="Bon état"], .filter-list input[type="checkbox"][value="Correct"]')]
+      .filter(cb => cb.checked).map(cb => cb.value);
+    const types = [...document.querySelectorAll('.filter-list input[type="checkbox"][value="achat"], .filter-list input[type="checkbox"][value="enchere"], .filter-list input[type="checkbox"][value="nego"]')]
+      .filter(cb => cb.checked).map(cb => cb.value);
+    const maxPrice = Number(document.getElementById("priceRange").value);
+    const search = document.getElementById("searchInput").value.toLowerCase().trim();
+    return { cat, genres, etats, types, maxPrice, search };
+  }
+
+  function applyFilters() {
+    const { cat, genres, etats, types, maxPrice, search } = getFilters();
+    const sort = document.getElementById("sortSelect").value;
+
+    filtered = allProducts.filter(p => {
+      if (cat && p.cat !== cat) return false;
+      if (genres.length && (!p.genre || !genres.includes(p.genre))) return false;
+      if (etats.length && !etats.includes(p.etat)) return false;
+      if (types.length && !types.includes(p.type)) return false;
+      if (p.price > maxPrice) return false;
+      if (search && !p.name.toLowerCase().includes(search)) return false;
+      return true;
+    });
+
+    if (sort === "price-asc")  filtered.sort((a, b) => a.price - b.price);
+    if (sort === "price-desc") filtered.sort((a, b) => b.price - a.price);
+    if (sort === "name-asc")   filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+    currentPage = 1;
+    renderActiveTags({ cat, genres, etats, types });
+    renderPage();
+  }
+
+  /* ── ACTIVE TAGS ── */
+  function renderActiveTags({ cat, genres, etats, types }) {
+    const container = document.getElementById("activeTags");
+    const tags = [];
+    if (cat) tags.push({ label: cat, action: () => { document.querySelector('input[name="cat"][value=""]').checked = true; applyFilters(); } });
+    genres.forEach(g => tags.push({ label: g, action: () => { document.querySelector(`.filter-list input[value="${g}"]`).checked = false; applyFilters(); } }));
+    etats.forEach(e => tags.push({ label: e, action: () => { document.querySelector(`.filter-list input[value="${CSS.escape(e)}"]`).checked = false; applyFilters(); } }));
+    types.forEach(t => {
+      const label = t === "achat" ? "Achat immédiat" : t === "enchere" ? "Enchère" : "Négociable";
+      tags.push({ label, action: () => { document.querySelector(`.filter-list input[value="${t}"]`).checked = false; applyFilters(); } });
+    });
+    container.innerHTML = tags.map((tag, i) => `
+      <span class="filter-tag">
+        ${tag.label}
+        <button onclick="removeTag(${i})" title="Retirer">×</button>
+      </span>
+    `).join("");
+    window._tagActions = tags.map(t => t.action);
+  }
+
+  function removeTag(i) { window._tagActions[i](); }
+
+  /* ── RENDER ── */
+  function renderPage() {
+    const grid = document.getElementById("productGrid");
+    const start = (currentPage - 1) * PER_PAGE;
+    const page = filtered.slice(start, start + PER_PAGE);
+
+    document.getElementById("resultCount").textContent =
+      `${filtered.length} résultat${filtered.length !== 1 ? "s" : ""}`;
+
+    if (page.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <p>Aucun produit ne correspond à vos critères.</p>
+        </div>`;
+      renderPagination();
+      return;
+    }
+
+    grid.innerHTML = page.map(p => {
+      const typeClass = p.type === "enchere" ? "btn-enchere" : p.type === "nego" ? "btn-nego" : "btn-achat";
+      const typeLabel = p.type === "enchere" ? "Enchère" : p.type === "nego" ? "Négo" : "Achat";
+      const priceLabel = p.type === "enchere" ? `${p.price} € (enchère)` : `${p.price} €`;
+      const timer = p.timer
+        ? `<div class="card-timer" data-id="${p.id}">⏱ ${formatTime(timerState[p.id] ?? 0)}</div>`
+        : "";
+
+      return `
+        <div class="card" onclick="openProduct(${p.id})">
+          <div class="card-img-wrapper" style="background:${p.bg}">
+            <img class="card-img" src="${p.img}" alt="${p.name}" onerror="this.style.display='none'">
+          </div>
+          <div class="card-body">
+            <div class="card-name">${p.name}</div>
+            ${timer}
+            <div class="card-price"><strong>${priceLabel}</strong></div>
+            <button class="btn ${typeClass}" onclick="actionClick(event,${p.id},'${p.type}')">${typeLabel}</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    renderPagination();
+  }
+
+  /* ── PAGINATION ── */
+  function renderPagination() {
+    const total = Math.ceil(filtered.length / PER_PAGE);
+    const container = document.getElementById("pagination");
+    if (total <= 1) { container.innerHTML = ""; return; }
+
+    let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""}>←</button>`;
+
+    const pages = getPageRange(currentPage, total);
+    pages.forEach(p => {
+      if (p === "…") {
+        html += `<span class="page-sep">…</span>`;
+      } else {
+        html += `<button class="page-btn ${p === currentPage ? "active" : ""}" onclick="goPage(${p})">${p}</button>`;
+      }
+    });
+
+    html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === total ? "disabled" : ""}>→</button>`;
+    container.innerHTML = html;
+  }
+
+  function getPageRange(cur, total) {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    const range = [];
+    if (cur <= 4) {
+      for (let i = 1; i <= 5; i++) range.push(i);
+      range.push("…", total);
+    } else if (cur >= total - 3) {
+      range.push(1, "…");
+      for (let i = total - 4; i <= total; i++) range.push(i);
+    } else {
+      range.push(1, "…", cur - 1, cur, cur + 1, "…", total);
+    }
+    return range;
+  }
+
+  function goPage(n) {
+    const total = Math.ceil(filtered.length / PER_PAGE);
+    if (n < 1 || n > total) return;
+    currentPage = n;
+    renderPage();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /* ── ACTIONS ── */
+  function openProduct(id) {
+    alert(`Fiche produit #${id} — à venir`);
+  }
+
+  function actionClick(e, id, type) {
+    e.stopPropagation();
+    const label = type === "nego" ? "Négocier" : type === "enchere" ? "Placer une enchère sur" : "Acheter";
+    alert(`${label} le produit #${id} — à venir`);
+  }
+
+  /* ── PRICE DISPLAY ── */
+  function updatePriceDisplay() {
+    document.getElementById("priceVal").textContent = document.getElementById("priceRange").value + " €";
+  }
+
+  /* ── RESET ── */
+  function resetFilters() {
+    document.querySelector('input[name="cat"][value=""]').checked = true;
+    document.querySelectorAll('.filter-list input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.getElementById("priceRange").value = 600;
+    document.getElementById("searchInput").value = "";
+    document.getElementById("sortSelect").value = "recent";
+    updatePriceDisplay();
+    applyFilters();
+  }
+
+  /* ── NOTIFICATIONS ── */
+  function toggleNotif() {
+    document.getElementById("notifPanel").classList.toggle("open");
+  }
+
+  document.addEventListener("click", function(e) {
+    const trigger = document.querySelector(".notif-trigger");
+    if (!trigger.contains(e.target)) {
+      document.getElementById("notifPanel").classList.remove("open");
+    }
+  });
+
+  /* ── INIT ── */
+  applyFilters();
+</script>
+
+</body>
+</html>
