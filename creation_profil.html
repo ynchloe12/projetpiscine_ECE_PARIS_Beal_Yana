@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mercato Nova – Connexion / Inscription</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #e8e8e8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: #fff;
+      border-bottom: 2px solid #222;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-weight: 900;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .logo::before { content: "♩"; font-size: 1.2rem; }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: #444;
+    }
+
+    nav input[type="search"] {
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      background: #f5f5f5;
+      color: #555;
+    }
+
+    nav a {
+      color: #333;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+
+    nav a:hover { text-decoration: underline; }
+
+    /* ── MAIN ── */
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 16px;
+    }
+
+    .cards {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 32px 28px;
+      width: 260px;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .field input[type="text"],
+    .field input[type="email"],
+    .field input[type="password"] {
+      width: 100%;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .field input:focus { border-color: #555; }
+
+    .field.checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .field.checkbox label { margin: 0; font-size: 0.82rem; }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      background: #222;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: background .2s;
+    }
+
+    .btn:hover { background: #444; }
+
+    .forgot {
+      display: block;
+      text-align: center;
+      font-size: 0.78rem;
+      color: #666;
+      margin-top: 10px;
+      text-decoration: none;
+    }
+
+    .forgot:hover { text-decoration: underline; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: #222;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      opacity: 0;
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">Mercato Nova</div>
+    <nav>
+      <input type="search" placeholder="Rechercher…" />
+      <a href="#">Catalogue</a>
+      <a href="#">Enchères</a>
+      <a href="#">⚙</a>
+      <a href="#">👤</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="cards">
+
+      <!-- ── CONNEXION ── -->
+      <div class="card">
+        <h2>Connexion</h2>
+        <form id="formConnexion" novalidate>
+          <div class="field">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" name="email" placeholder="" required />
+          </div>
+          <div class="field">
+            <label for="loginPassword">Mot de passe</label>
+            <input type="password" id="loginPassword" name="password" required />
+          </div>
+          <button type="submit" class="btn">Se connecter</button>
+          <a href="#" class="forgot">Mot de passe oublié ?</a>
+        </form>
+      </div>
+
+      <!-- ── INSCRIPTION ── -->
+      <div class="card">
+        <h2>Inscription</h2>
+        <form id="formInscription" novalidate>
+          <div class="field">
+            <label for="regPseudo">Pseudo</label>
+            <input type="text" id="regPseudo" name="pseudo" required />
+          </div>
+          <div class="field">
+            <label for="regEmail">Email</label>
+            <input type="email" id="regEmail" name="email" required />
+          </div>
+          <div class="field">
+            <label for="regPassword">Mot de passe</label>
+            <input type="password" id="regPassword" name="password" required />
+          </div>
+          <div class="field">
+            <label for="regConfirm">Confirmer le mot de passe</label>
+            <input type="password" id="regConfirm" name="confirm" required />
+          </div>
+          <div class="field checkbox">
+            <input type="checkbox" id="cgu" name="cgu" required />
+            <label for="cgu">J'accepte les CGU</label>
+          </div>
+          <button type="submit" class="btn">Créer mon compte</button>
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="toast"></div>
+
+  <script>
+    const toast = document.getElementById('toast');
+
+    function showToast(msg, duration = 3000) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    /* ── Connexion ── */
+    document.getElementById('formConnexion').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email    = this.email.value.trim();
+      const password = this.password.value;
+
+      if (!email || !password) {
+        showToast('Veuillez remplir tous les champs.');
+        return;
+      }
+
+      const data = { email, password };
+      console.log('Connexion envoyée :', data);
+      showToast('Connexion réussie ! Bienvenue.');
+      this.reset();
+    });
+
+    /* ── Inscription ── */
+    document.getElementById('formInscription').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const pseudo   = this.pseudo.value.trim();
+      const email    = this.email.value.trim();
+      const password = this.password.value;
+      const confirm  = this.confirm.value;
+      const cgu      = this.cgu.checked;
+
+      if (!pseudo || !email || !password || !confirm) {
+        showToast('Veuillez remplir tous les champs.');
+        return;
+      }
+      if (password !== confirm) {
+        showToast('Les mots de passe ne correspondent pas.');
+        return;
+      }
+      if (!cgu) {
+        showToast('Vous devez accepter les CGU.');
+        return;
+      }
+
+      const data = { pseudo, email, password };
+      console.log('Inscription envoyée :', data);
+      showToast('Compte créé avec succès !');
+      this.reset();
+    });
+  </script>
+
+</body>
+</html>
