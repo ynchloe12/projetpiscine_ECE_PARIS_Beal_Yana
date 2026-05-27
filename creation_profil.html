@@ -3,298 +3,914 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mercato Nova – Connexion / Inscription</title>
+  <title>Mes annonces — Mercato Nova</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: Arial, sans-serif;
-      background: #e8e8e8;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
     }
 
     /* ── HEADER ── */
     header {
       background: #fff;
-      border-bottom: 2px solid #222;
-      padding: 10px 24px;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0 32px;
+      height: 56px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     .logo {
-      font-weight: 900;
-      font-size: 1.1rem;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 1.3rem; font-weight: 800; letter-spacing: 0.5px;
+      color: #1a1a1a; text-decoration: none; white-space: nowrap;
+    }
+    .logo span { font-size: 1.4rem; }
+
+    .search-bar { flex: 1; max-width: 380px; margin-left: auto; position: relative; }
+    .search-bar input {
+      width: 100%; padding: 8px 14px 8px 36px;
+      border: 1px solid #ddd; border-radius: 20px;
+      background: #f2f2f2; font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+    }
+    .search-bar input:focus { border-color: #a0a0a0; background: #fff; }
+    .search-bar .icon-search {
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      color: #888; font-size: 0.9rem;
     }
 
-    .logo::before { content: "♩"; font-size: 1.2rem; }
-
-    nav {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.85rem;
-      color: #444;
-    }
-
-    nav input[type="search"] {
-      border: 1px solid #bbb;
-      border-radius: 4px;
-      padding: 4px 8px;
-      font-size: 0.8rem;
-      background: #f5f5f5;
-      color: #555;
-    }
-
+    nav { display: flex; align-items: center; gap: 4px; }
     nav a {
-      color: #333;
-      text-decoration: none;
-      font-size: 0.85rem;
+      text-decoration: none; color: #1a1a1a;
+      font-size: 0.95rem; font-weight: 500;
+      padding: 6px 12px; border-radius: 6px; transition: background 0.15s;
+    }
+    nav a:hover { background: #f0f0f0; }
+    nav a.active { font-weight: 700; background: #f0f0f0; }
+
+    .nav-icons { display: flex; align-items: center; gap: 2px; }
+    .nav-icon {
+      position: relative; background: none; border: none; cursor: pointer;
+      padding: 8px; border-radius: 50%; font-size: 1.1rem;
+      color: #1a1a1a; transition: background 0.15s; display: flex; align-items: center;
+    }
+    .nav-icon:hover { background: #f0f0f0; }
+    .badge {
+      position: absolute; top: 4px; right: 4px;
+      background: #e53e3e; color: #fff; font-size: 0.6rem; font-weight: 700;
+      border-radius: 999px; min-width: 16px; height: 16px;
+      display: flex; align-items: center; justify-content: center; padding: 0 3px;
     }
 
-    nav a:hover { text-decoration: underline; }
-
-    /* ── MAIN ── */
-    main {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 40px 16px;
+    /* ── LAYOUT ── */
+    .page-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 16px 60px;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 28px;
+      align-items: flex-start;
     }
 
-    .cards {
-      display: flex;
-      gap: 24px;
-      flex-wrap: wrap;
-      justify-content: center;
+    @media (max-width: 800px) {
+      .page-wrapper { grid-template-columns: 1fr; }
     }
 
-    /* ── CARD ── */
-    .card {
+    /* ── FORM PANEL ── */
+    .form-panel {
       background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 32px 28px;
-      width: 260px;
+      border: 1px solid #e8e8e8;
+      border-radius: 14px;
+      padding: 24px 20px;
+      position: sticky;
+      top: 72px;
     }
 
-    .card h2 {
-      font-size: 1.1rem;
-      font-weight: 700;
+    .form-panel-title {
+      font-size: 1.05rem;
+      font-weight: 800;
       margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+
+    .form-panel-title .edit-badge {
+      font-size: 0.72rem;
+      background: #f59e0b;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      display: none;
+    }
+    .form-panel-title .edit-badge.visible { display: inline; }
 
     .field { margin-bottom: 14px; }
 
     .field label {
       display: block;
-      font-size: 0.82rem;
-      color: #333;
-      margin-bottom: 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #555;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
 
-    .field input[type="text"],
-    .field input[type="email"],
-    .field input[type="password"] {
+    .field input,
+    .field select,
+    .field textarea {
       width: 100%;
-      border: 1px solid #bbb;
-      border-radius: 4px;
-      padding: 8px 10px;
-      font-size: 0.85rem;
+      padding: 9px 12px;
+      border: 1px solid #d8d8d8;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: #1a1a1a;
+      background: #fafafa;
       outline: none;
-      transition: border-color .2s;
+      transition: border-color 0.2s, background 0.2s;
     }
 
-    .field input:focus { border-color: #555; }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: #1a1a1a;
+      background: #fff;
+    }
 
-    .field.checkbox {
+    .field textarea { resize: vertical; min-height: 80px; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .timer-field { display: none; }
+    .timer-field.visible { display: block; }
+
+    .photo-preview {
+      width: 100%;
+      aspect-ratio: 4/3;
+      border: 2px dashed #ddd;
+      border-radius: 8px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      font-size: 0.82rem;
+      color: #aaa;
       margin-top: 6px;
+      overflow: hidden;
+      background: #fafafa;
+      cursor: pointer;
+      transition: border-color 0.2s;
     }
+    .photo-preview:hover { border-color: #aaa; }
+    .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-preview input[type="file"] { display: none; }
 
-    .field.checkbox label { margin: 0; font-size: 0.82rem; }
-
-    .btn {
+    .btn-submit {
       width: 100%;
-      padding: 10px;
-      background: #222;
+      padding: 12px;
+      background: #1a1a1a;
       color: #fff;
       border: none;
-      border-radius: 4px;
-      font-size: 0.9rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
       font-weight: 700;
       cursor: pointer;
       margin-top: 6px;
-      transition: background .2s;
+      transition: opacity 0.15s;
+    }
+    .btn-submit:hover { opacity: 0.85; }
+
+    .btn-cancel {
+      width: 100%;
+      padding: 10px;
+      background: #fff;
+      color: #888;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.15s;
+      display: none;
+    }
+    .btn-cancel.visible { display: block; }
+    .btn-cancel:hover { background: #f5f5f5; }
+
+    /* ── DASHBOARD PANEL ── */
+    .dashboard-panel { min-width: 0; }
+
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .btn:hover { background: #444; }
+    .dash-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
 
-    .forgot {
-      display: block;
+    /* Stats cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .stat-card {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 12px;
+      padding: 16px;
       text-align: center;
-      font-size: 0.78rem;
-      color: #666;
-      margin-top: 10px;
-      text-decoration: none;
     }
 
-    .forgot:hover { text-decoration: underline; }
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #1a1a1a;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    /* Section annonces */
+    .annonces-section {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .annonces-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .annonces-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .annonces-count {
+      font-size: 0.82rem;
+      color: #888;
+    }
+
+    /* Empty state */
+    .empty-annonces {
+      padding: 48px 20px;
+      text-align: center;
+      color: #aaa;
+    }
+    .empty-annonces .icon { font-size: 2.2rem; margin-bottom: 10px; }
+    .empty-annonces p { font-size: 0.92rem; }
+
+    /* Table */
+    .annonces-table { width: 100%; border-collapse: collapse; }
+
+    .annonces-table thead th {
+      padding: 10px 16px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #888;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+      background: #fafafa;
+    }
+
+    .annonces-table tbody tr {
+      border-bottom: 1px solid #f5f5f5;
+      transition: background 0.1s;
+    }
+    .annonces-table tbody tr:last-child { border-bottom: none; }
+    .annonces-table tbody tr:hover { background: #fafafa; }
+
+    .annonces-table td {
+      padding: 14px 16px;
+      font-size: 0.88rem;
+      vertical-align: middle;
+    }
+
+    .td-name { font-weight: 700; }
+
+    .td-thumb {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #e8e8e8;
+      display: block;
+    }
+
+    .td-thumb-placeholder {
+      width: 40px; height: 40px;
+      background: #e8e8e8;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    /* Status badges */
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .status-active  { background: #dcfce7; color: #166534; }
+    .status-encours { background: #fef3c7; color: #92400e; }
+    .status-nego    { background: #dbeafe; color: #1e40af; }
+    .status-termine { background: #f3f4f6; color: #6b7280; }
+
+    /* Type badges */
+    .type-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .type-achat   { background: #1a1a1a; color: #fff; }
+    .type-enchere { background: #f59e0b; color: #fff; }
+    .type-nego    { background: #22c55e; color: #fff; }
+
+    .td-actions { display: flex; gap: 8px; align-items: center; }
+
+    .btn-edit {
+      padding: 5px 12px;
+      background: #fff;
+      color: #1a1a1a;
+      border: 1.5px solid #d0d0d0;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .btn-edit:hover { background: #f5f5f5; border-color: #aaa; }
+
+    .btn-delete {
+      padding: 5px 10px;
+      background: #fff;
+      color: #e53e3e;
+      border: 1.5px solid #e53e3e;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .btn-delete:hover { background: #fff5f5; }
 
     /* ── TOAST ── */
-    #toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(60px);
-      background: #222;
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-size: 0.88rem;
-      opacity: 0;
-      transition: opacity .3s, transform .3s;
-      pointer-events: none;
-      z-index: 999;
+    .toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: #1a1a1a; color: #fff;
+      padding: 12px 22px; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none; z-index: 999;
     }
+    .toast.show { opacity: 1; transform: translateY(0); }
 
-    #toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
+    /* ── MODAL CONFIRMATION ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none; align-items: center; justify-content: center;
+      z-index: 500;
     }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px 32px;
+      max-width: 360px;
+      width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      text-align: center;
+    }
+    .modal-icon { font-size: 2.2rem; margin-bottom: 10px; }
+    .modal-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 8px; }
+    .modal-text { font-size: 0.88rem; color: #555; margin-bottom: 22px; line-height: 1.5; }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-btn-confirm {
+      flex: 1; padding: 10px;
+      background: #e53e3e; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .modal-btn-confirm:hover { opacity: 0.85; }
+    .modal-btn-cancel {
+      flex: 1; padding: 10px;
+      background: #fff; color: #1a1a1a;
+      border: 1.5px solid #ddd; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .modal-btn-cancel:hover { background: #f5f5f5; }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="logo">Mercato Nova</div>
-    <nav>
-      <input type="search" placeholder="Rechercher…" />
-      <a href="#">Catalogue</a>
-      <a href="#">Enchères</a>
-      <a href="#">⚙</a>
-      <a href="#">👤</a>
-    </nav>
-  </header>
+<!-- ══ HEADER ══ -->
+<header>
+  <a class="logo" href="Index_mercato_nova.html"><span>♪</span> MERCATO NOVA</a>
 
-  <main>
-    <div class="cards">
+  <div class="search-bar">
+    <span class="icon-search">🔍</span>
+    <input type="text" placeholder="Rechercher..." />
+  </div>
 
-      <!-- ── CONNEXION ── -->
-      <div class="card">
-        <h2>Connexion</h2>
-        <form id="formConnexion" novalidate>
-          <div class="field">
-            <label for="loginEmail">Email</label>
-            <input type="email" id="loginEmail" name="email" placeholder="" required />
-          </div>
-          <div class="field">
-            <label for="loginPassword">Mot de passe</label>
-            <input type="password" id="loginPassword" name="password" required />
-          </div>
-          <button type="submit" class="btn">Se connecter</button>
-          <a href="#" class="forgot">Mot de passe oublié ?</a>
-        </form>
-      </div>
+  <nav>
+    <a href="Index_mercato_nova.html">Accueil</a>
+    <a href="catalogue.html">Catalogue</a>
+    <a href="encheres.html">Enchères</a>
+    <a href="creation_annonce.html" class="active">Mes annonces</a>
+  </nav>
 
-      <!-- ── INSCRIPTION ── -->
-      <div class="card">
-        <h2>Inscription</h2>
-        <form id="formInscription" novalidate>
-          <div class="field">
-            <label for="regPseudo">Pseudo</label>
-            <input type="text" id="regPseudo" name="pseudo" required />
-          </div>
-          <div class="field">
-            <label for="regEmail">Email</label>
-            <input type="email" id="regEmail" name="email" required />
-          </div>
-          <div class="field">
-            <label for="regPassword">Mot de passe</label>
-            <input type="password" id="regPassword" name="password" required />
-          </div>
-          <div class="field">
-            <label for="regConfirm">Confirmer le mot de passe</label>
-            <input type="password" id="regConfirm" name="confirm" required />
-          </div>
-          <div class="field checkbox">
-            <input type="checkbox" id="cgu" name="cgu" required />
-            <label for="cgu">J'accepte les CGU</label>
-          </div>
-          <button type="submit" class="btn">Créer mon compte</button>
-        </form>
-      </div>
+  <div class="nav-icons">
+    <button class="nav-icon" onclick="window.location.href='panier.html'" title="Panier">🛒<span class="badge" id="cartBadge" style="display:none">0</span></button>
+    <button class="nav-icon" onclick="goToProfile()" title="Mon compte">👤</button>
+  </div>
+</header>
 
+<!-- ══ PAGE ══ -->
+<div class="page-wrapper">
+
+  <!-- ── FORMULAIRE ── -->
+  <aside class="form-panel">
+    <div class="form-panel-title">
+      <span id="formTitle">Créer une annonce</span>
+      <span class="edit-badge" id="editBadge">Modification</span>
     </div>
-  </main>
 
-  <div id="toast"></div>
+    <div class="field">
+      <label for="fTitre">Titre *</label>
+      <input type="text" id="fTitre" placeholder="Ex : Abbey Road — Beatles" maxlength="120" />
+    </div>
 
-  <script>
-    const toast = document.getElementById('toast');
+    <div class="field-row">
+      <div class="field">
+        <label for="fCategorie">Catégorie *</label>
+        <select id="fCategorie">
+          <option value="">— Choisir —</option>
+          <option value="Vinyle">Vinyle</option>
+          <option value="CD">CD</option>
+          <option value="Platine">Platine</option>
+          <option value="Ampli">Ampli</option>
+          <option value="Casque">Casque</option>
+          <option value="Enceinte">Enceinte</option>
+          <option value="Accessoire">Accessoire</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fGenre">Genre musical</label>
+        <select id="fGenre">
+          <option value="">— Aucun —</option>
+          <option value="Rock">Rock</option>
+          <option value="Jazz">Jazz</option>
+          <option value="Electro">Electro</option>
+          <option value="Classique">Classique</option>
+          <option value="Hip-Hop">Hip-Hop</option>
+        </select>
+      </div>
+    </div>
 
-    function showToast(msg, duration = 3000) {
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), duration);
+    <div class="field-row">
+      <div class="field">
+        <label for="fEtat">État *</label>
+        <select id="fEtat">
+          <option value="">— Choisir —</option>
+          <option value="Neuf / Scellé">Neuf / Scellé</option>
+          <option value="Excellent">Excellent</option>
+          <option value="Bon état">Bon état</option>
+          <option value="Correct">Correct</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fType">Type de vente *</label>
+        <select id="fType" onchange="onTypeChange()">
+          <option value="">— Choisir —</option>
+          <option value="achat">Achat immédiat</option>
+          <option value="enchere">Enchère</option>
+          <option value="nego">Négociable</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="fPrix">Prix (€) *</label>
+        <input type="number" id="fPrix" placeholder="Ex : 45" min="1" step="1" />
+      </div>
+      <div class="field timer-field" id="timerField">
+        <label for="fTimer">Durée enchère</label>
+        <input type="time" id="fTimer" step="1" value="02:00:00" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Photo</label>
+      <div class="photo-preview" id="photoPreview" onclick="document.getElementById('fPhoto').click()">
+        <input type="file" id="fPhoto" accept="image/*" onchange="previewPhoto(event)" />
+        <span id="photoPlaceholder">📷 Cliquer pour ajouter</span>
+        <img id="photoImg" src="" alt="" style="display:none" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="fDesc">Description</label>
+      <textarea id="fDesc" placeholder="Décrivez l'article, son état, son histoire..." maxlength="600"></textarea>
+    </div>
+
+    <input type="hidden" id="editingId" value="" />
+
+    <button class="btn-submit" id="btnSubmit" onclick="submitAnnonce()">Publier l'annonce</button>
+    <button class="btn-cancel" id="btnCancel" onclick="cancelEdit()">Annuler la modification</button>
+  </aside>
+
+  <!-- ── DASHBOARD ── -->
+  <div class="dashboard-panel">
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-value" id="statActives">0</div>
+        <div class="stat-label">Annonces actives</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statEncheres">0</div>
+        <div class="stat-label">Enchères en cours</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statNego">0</div>
+        <div class="stat-label">Négociations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-label">Annonces créées</div>
+      </div>
+    </div>
+
+    <!-- Liste annonces -->
+    <div class="annonces-section">
+      <div class="annonces-header">
+        <div>
+          <div class="annonces-title">Mes annonces</div>
+          <div class="annonces-count" id="annoncesCount">0 annonce</div>
+        </div>
+      </div>
+      <div id="annoncesBody"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── MODAL SUPPRESSION ── -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-icon">🗑️</div>
+    <div class="modal-title">Supprimer l'annonce ?</div>
+    <div class="modal-text" id="modalText">Cette action est irréversible.</div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeModal()">Annuler</button>
+      <button class="modal-btn-confirm" onclick="confirmDelete()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ═══════════════════════════
+     STORAGE
+  ═══════════════════════════ */
+  const STORAGE_KEY = 'mn_annonces';
+
+  function getAnnonces() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  }
+
+  function saveAnnonces(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+
+  /* ═══════════════════════════
+     FORM
+  ═══════════════════════════ */
+  function onTypeChange() {
+    const type = document.getElementById('fType').value;
+    const timerField = document.getElementById('timerField');
+    timerField.classList.toggle('visible', type === 'enchere');
+  }
+
+  function previewPhoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      document.getElementById('photoImg').src = ev.target.result;
+      document.getElementById('photoImg').style.display = 'block';
+      document.getElementById('photoPlaceholder').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function getFormData() {
+    return {
+      titre:    document.getElementById('fTitre').value.trim(),
+      cat:      document.getElementById('fCategorie').value,
+      genre:    document.getElementById('fGenre').value || null,
+      etat:     document.getElementById('fEtat').value,
+      type:     document.getElementById('fType').value,
+      prix:     parseFloat(document.getElementById('fPrix').value),
+      timer:    document.getElementById('fType').value === 'enchere' ? document.getElementById('fTimer').value : null,
+      photo:    document.getElementById('photoImg').src || null,
+      desc:     document.getElementById('fDesc').value.trim(),
+    };
+  }
+
+  function validateForm(data) {
+    if (!data.titre)       { showToast('Le titre est obligatoire.'); return false; }
+    if (!data.cat)         { showToast('Choisissez une catégorie.'); return false; }
+    if (!data.etat)        { showToast('Précisez l\'état de l\'article.'); return false; }
+    if (!data.type)        { showToast('Choisissez un type de vente.'); return false; }
+    if (!data.prix || data.prix <= 0) { showToast('Entrez un prix valide.'); return false; }
+    return true;
+  }
+
+  function submitAnnonce() {
+    const data = getFormData();
+    if (!validateForm(data)) return;
+
+    const editingId = document.getElementById('editingId').value;
+    const list = getAnnonces();
+
+    if (editingId) {
+      const idx = list.findIndex(a => a.id === editingId);
+      if (idx !== -1) {
+        list[idx] = { ...list[idx], ...data };
+        showToast('Annonce mise à jour !');
+      }
+    } else {
+      const cu = JSON.parse(localStorage.getItem('mn_currentUser') || 'null');
+      list.unshift({
+        id:        Date.now().toString(),
+        createdAt: new Date().toLocaleDateString('fr-FR'),
+        vendeur:   cu ? (cu.pseudo || cu.email) : 'anonyme',
+        ...data,
+      });
+      showToast('Annonce publiée !');
     }
 
-    /* ── Connexion ── */
-    document.getElementById('formConnexion').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const email    = this.email.value.trim();
-      const password = this.password.value;
+    saveAnnonces(list);
+    resetForm();
+    renderAll();
+  }
 
-      if (!email || !password) {
-        showToast('Veuillez remplir tous les champs.');
-        return;
-      }
+  function resetForm() {
+    document.getElementById('fTitre').value    = '';
+    document.getElementById('fCategorie').value = '';
+    document.getElementById('fGenre').value    = '';
+    document.getElementById('fEtat').value     = '';
+    document.getElementById('fType').value     = '';
+    document.getElementById('fPrix').value     = '';
+    document.getElementById('fTimer').value    = '02:00:00';
+    document.getElementById('fDesc').value     = '';
+    document.getElementById('editingId').value = '';
+    document.getElementById('photoImg').src    = '';
+    document.getElementById('photoImg').style.display = 'none';
+    document.getElementById('photoPlaceholder').style.display = '';
+    document.getElementById('fPhoto').value   = '';
+    document.getElementById('timerField').classList.remove('visible');
+    document.getElementById('formTitle').textContent = 'Créer une annonce';
+    document.getElementById('editBadge').classList.remove('visible');
+    document.getElementById('btnSubmit').textContent = 'Publier l\'annonce';
+    document.getElementById('btnCancel').classList.remove('visible');
+  }
 
-      const data = { email, password };
-      console.log('Connexion envoyée :', data);
-      showToast('Connexion réussie ! Bienvenue.');
-      this.reset();
-    });
+  function cancelEdit() {
+    resetForm();
+  }
 
-    /* ── Inscription ── */
-    document.getElementById('formInscription').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const pseudo   = this.pseudo.value.trim();
-      const email    = this.email.value.trim();
-      const password = this.password.value;
-      const confirm  = this.confirm.value;
-      const cgu      = this.cgu.checked;
+  function fillForm(annonce) {
+    document.getElementById('fTitre').value     = annonce.titre;
+    document.getElementById('fCategorie').value  = annonce.cat;
+    document.getElementById('fGenre').value     = annonce.genre || '';
+    document.getElementById('fEtat').value      = annonce.etat;
+    document.getElementById('fType').value      = annonce.type;
+    document.getElementById('fPrix').value      = annonce.prix;
+    document.getElementById('fDesc').value      = annonce.desc || '';
+    document.getElementById('editingId').value  = annonce.id;
 
-      if (!pseudo || !email || !password || !confirm) {
-        showToast('Veuillez remplir tous les champs.');
-        return;
-      }
-      if (password !== confirm) {
-        showToast('Les mots de passe ne correspondent pas.');
-        return;
-      }
-      if (!cgu) {
-        showToast('Vous devez accepter les CGU.');
-        return;
-      }
+    if (annonce.type === 'enchere') {
+      document.getElementById('timerField').classList.add('visible');
+      document.getElementById('fTimer').value = annonce.timer || '02:00:00';
+    } else {
+      document.getElementById('timerField').classList.remove('visible');
+    }
 
-      const data = { pseudo, email, password };
-      console.log('Inscription envoyée :', data);
-      showToast('Compte créé avec succès !');
-      this.reset();
-    });
-  </script>
+    if (annonce.photo && annonce.photo.startsWith('data:')) {
+      document.getElementById('photoImg').src = annonce.photo;
+      document.getElementById('photoImg').style.display = 'block';
+      document.getElementById('photoPlaceholder').style.display = 'none';
+    }
+
+    document.getElementById('formTitle').textContent = 'Modifier l\'annonce';
+    document.getElementById('editBadge').classList.add('visible');
+    document.getElementById('btnSubmit').textContent = 'Mettre à jour';
+    document.getElementById('btnCancel').classList.add('visible');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('fTitre').focus();
+  }
+
+  /* ═══════════════════════════
+     DELETE
+  ═══════════════════════════ */
+  let pendingDeleteId = null;
+
+  function openDeleteModal(id, titre) {
+    pendingDeleteId = id;
+    document.getElementById('modalText').textContent = `« ${titre} » sera définitivement supprimée.`;
+    document.getElementById('deleteModal').classList.add('open');
+  }
+
+  function closeModal() {
+    pendingDeleteId = null;
+    document.getElementById('deleteModal').classList.remove('open');
+  }
+
+  function confirmDelete() {
+    if (!pendingDeleteId) return;
+    const list = getAnnonces().filter(a => a.id !== pendingDeleteId);
+    saveAnnonces(list);
+    closeModal();
+    resetForm();
+    renderAll();
+    showToast('Annonce supprimée.');
+  }
+
+  /* ═══════════════════════════
+     RENDER
+  ═══════════════════════════ */
+  function renderAll() {
+    const list = getAnnonces();
+    renderStats(list);
+    renderTable(list);
+  }
+
+  function renderStats(list) {
+    document.getElementById('statActives').textContent  = list.filter(a => a.type === 'achat').length;
+    document.getElementById('statEncheres').textContent = list.filter(a => a.type === 'enchere').length;
+    document.getElementById('statNego').textContent     = list.filter(a => a.type === 'nego').length;
+    document.getElementById('statTotal').textContent    = list.length;
+
+    const n = list.length;
+    document.getElementById('annoncesCount').textContent = `${n} annonce${n !== 1 ? 's' : ''}`;
+  }
+
+  function renderTable(list) {
+    const body = document.getElementById('annoncesBody');
+
+    if (list.length === 0) {
+      body.innerHTML = `
+        <div class="empty-annonces">
+          <div class="icon">📋</div>
+          <p>Aucune annonce pour l'instant.<br>Créez votre première annonce via le formulaire.</p>
+        </div>`;
+      return;
+    }
+
+    const typeLabel = { achat: 'Achat immédiat', enchere: 'Enchère', nego: 'Négociable' };
+    const typeClass = { achat: 'type-achat', enchere: 'type-enchere', nego: 'type-nego' };
+    const statusLabel = { achat: 'Active', enchere: 'En cours', nego: 'Négo active' };
+    const statusClass = { achat: 'status-active', enchere: 'status-encours', nego: 'status-nego' };
+
+    body.innerHTML = `
+      <table class="annonces-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Titre</th>
+            <th>Type</th>
+            <th>État</th>
+            <th>Prix</th>
+            <th>Créée le</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map(a => `
+            <tr>
+              <td>
+                ${a.photo && a.photo.startsWith('data:')
+                  ? `<img class="td-thumb" src="${a.photo}" alt="" />`
+                  : `<div class="td-thumb-placeholder">🎵</div>`}
+              </td>
+              <td class="td-name">${escHtml(a.titre)}</td>
+              <td><span class="type-badge ${typeClass[a.type]}">${typeLabel[a.type]}</span></td>
+              <td><span class="status-badge ${statusClass[a.type]}">${statusLabel[a.type]}</span></td>
+              <td><strong>${a.prix} €</strong></td>
+              <td style="color:#888;font-size:0.82rem">${a.createdAt || '—'}</td>
+              <td>
+                <div class="td-actions">
+                  <button class="btn-edit" onclick="editAnnonce('${a.id}')">✏️ Modifier</button>
+                  <button class="btn-delete" onclick="openDeleteModal('${a.id}', '${escHtml(a.titre).replace(/'/g, "\\'")}')">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function editAnnonce(id) {
+    const annonce = getAnnonces().find(a => a.id === id);
+    if (annonce) fillForm(annonce);
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ═══════════════════════════
+     TOAST
+  ═══════════════════════════ */
+  let toastTimer = null;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function goToProfile() {
+    window.location.href = 'Creationprofile.html';
+  }
+
+  /* ── PANIER BADGE ── */
+  function updateCartBadge() {
+    const cart = JSON.parse(localStorage.getItem('mn_cart') || '[]');
+    const total = cart.reduce((s, i) => s + i.qty, 0);
+    const badge = document.getElementById('cartBadge');
+    badge.textContent = total;
+    badge.style.display = total > 0 ? 'flex' : 'none';
+  }
+
+  /* ═══════════════════════════
+     INIT
+  ═══════════════════════════ */
+  renderAll();
+  updateCartBadge();
+</script>
 
 </body>
 </html>
