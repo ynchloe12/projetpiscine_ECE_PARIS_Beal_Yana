@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Article — Mercato Nova</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 300;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 1.3rem; font-weight: 800; letter-spacing: 0.5px;
+      color: #1a1a1a; text-decoration: none; white-space: nowrap;
+    }
+    .logo span { font-size: 1.4rem; }
+
+    .search-bar { flex: 1; max-width: 380px; margin-left: auto; position: relative; }
+    .search-bar input {
+      width: 100%; padding: 8px 14px 8px 36px;
+      border: 1px solid #ddd; border-radius: 20px;
+      background: #f2f2f2; font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+    }
+    .search-bar input:focus { border-color: #a0a0a0; background: #fff; }
+    .search-bar .icon-search {
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      color: #888; font-size: 0.9rem;
+    }
+
+    nav { display: flex; align-items: center; gap: 4px; }
+    nav a {
+      text-decoration: none; color: #1a1a1a;
+      font-size: 0.95rem; font-weight: 500;
+      padding: 6px 12px; border-radius: 6px; transition: background 0.15s;
+    }
+    nav a:hover { background: #f0f0f0; }
+
+    .nav-icons { display: flex; align-items: center; gap: 2px; }
+    .nav-icon {
+      position: relative; background: none; border: none; cursor: pointer;
+      padding: 8px; border-radius: 50%; font-size: 1.1rem;
+      color: #1a1a1a; transition: background 0.15s; display: flex; align-items: center;
+    }
+    .nav-icon:hover { background: #f0f0f0; }
+
+    .badge {
+      position: absolute; top: 4px; right: 4px;
+      background: #e53e3e; color: #fff; font-size: 0.6rem; font-weight: 700;
+      border-radius: 999px; min-width: 16px; height: 16px;
+      display: flex; align-items: center; justify-content: center; padding: 0 3px;
+    }
+
+    .notif-trigger { position: relative; }
+    .notif-panel {
+      position: absolute; top: 52px; right: 0; width: 300px;
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 12px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12); display: none; z-index: 400; overflow: hidden;
+    }
+    .notif-panel.open { display: block; }
+    .notif-header { padding: 12px 16px; font-weight: 700; border-bottom: 1px solid #f0f0f0; font-size: 0.95rem; }
+    .notif-item {
+      display: flex; gap: 10px; padding: 10px 16px;
+      border-bottom: 1px solid #f8f8f8; font-size: 0.84rem;
+      align-items: flex-start; transition: background 0.1s;
+    }
+    .notif-item:hover { background: #fafafa; }
+    .notif-item .icon { font-size: 1.1rem; margin-top: 1px; }
+    .notif-item p { line-height: 1.4; }
+    .notif-item small { color: #888; }
+    .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; margin-top: 5px; flex-shrink: 0; }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      font-size: 0.83rem; color: #888; margin-bottom: 20px;
+    }
+    .breadcrumb a { color: #888; text-decoration: none; }
+    .breadcrumb a:hover { color: #1a1a1a; text-decoration: underline; }
+    .breadcrumb span { color: #1a1a1a; font-weight: 500; }
+
+    /* ── ARTICLE LAYOUT ── */
+    .article-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 36px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 720px) {
+      .article-layout { grid-template-columns: 1fr; gap: 20px; }
+    }
+
+    /* ── GALLERY ── */
+    .main-img-wrapper {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid #e8e8e8;
+      background: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #mainImg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ── INFO ── */
+    .type-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .badge-enchere { background: #f59e0b; color: #fff; }
+    .badge-achat   { background: #1a1a1a; color: #fff; }
+    .badge-nego    { background: #22c55e; color: #fff; }
+
+    .article-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .article-sub {
+      font-size: 0.88rem;
+      color: #666;
+      margin-bottom: 12px;
+    }
+
+    .article-seller {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .article-seller a {
+      color: #1a1a1a;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .article-seller a:hover { text-decoration: underline; }
+    .seller-rating { color: #888; font-size: 0.85rem; }
+
+    /* ── PRICE SECTION ── */
+    .price-section { margin-bottom: 20px; }
+
+    .price-main {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+
+    .price-label {
+      font-size: 0.82rem;
+      color: #888;
+      margin-bottom: 12px;
+    }
+
+    /* Enchère */
+    .enchere-box {
+      background: #fff8ec;
+      border: 1.5px solid #f59e0b;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 4px;
+    }
+
+    .enchere-timer {
+      font-size: 0.88rem;
+      color: #e53e3e;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .enchere-current {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .enchere-current strong { color: #1a1a1a; font-size: 1rem; }
+
+    .bid-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .bid-row input {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .bid-row input:focus { border-color: #f59e0b; }
+
+    .btn-bid {
+      padding: 9px 18px;
+      background: #f59e0b;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+    .btn-bid:hover { opacity: 0.85; }
+
+    .bid-hint { font-size: 0.78rem; color: #888; margin-top: 6px; }
+
+    .bid-history {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    .bid-history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    /* Quantité */
+    .qty-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .qty-label { font-size: 0.88rem; color: #555; }
+
+    .qty-ctrl {
+      display: flex;
+      align-items: center;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .qty-btn {
+      background: #f5f5f5;
+      border: none;
+      width: 32px;
+      height: 32px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .qty-btn:hover { background: #e8e8e8; }
+
+    .qty-val {
+      width: 36px;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: none;
+      outline: none;
+      background: #fff;
+    }
+
+    /* Négociation offre rapide */
+    .nego-quick {
+      background: #f0fdf4;
+      border: 1.5px solid #22c55e;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 4px;
+    }
+
+    .nego-quick-label {
+      font-size: 0.84rem;
+      color: #166534;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    /* ── ACTION BUTTONS ── */
+    .article-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .btn-cart {
+      padding: 12px 24px;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-cart:hover { opacity: 0.8; }
+
+    .btn-fav {
+      padding: 11px 24px;
+      background: #fff;
+      color: #1a1a1a;
+      border: 1.5px solid #d0d0d0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-fav:hover { background: #f5f5f5; border-color: #bbb; }
+    .btn-fav.active { color: #e53e3e; border-color: #e53e3e; }
+
+    .btn-chat {
+      padding: 11px 24px;
+      background: #5b8dee;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-chat:hover { opacity: 0.85; }
+
+    /* ── DESCRIPTION ── */
+    .article-desc {
+      background: #f9f9f9;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .desc-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .desc-text {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── CHAT PANEL ── */
+    .chat-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 500;
+    }
+    .chat-overlay.open { opacity: 1; pointer-events: all; }
+
+    .chat-panel {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: 380px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      transition: right 0.32s cubic-bezier(0.4,0,0.2,1);
+      z-index: 600;
+    }
+    .chat-panel.open { right: 0; }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid #f0f0f0;
+      background: #1a1a1a;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .chat-header-title { font-size: 0.95rem; font-weight: 700; }
+
+    .chat-close {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.4rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+      opacity: 0.7;
+      transition: opacity 0.15s;
+    }
+    .chat-close:hover { opacity: 1; }
+
+    .chat-product-strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: #f8f8f8;
+      border-bottom: 1px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+
+    .chat-product-strip img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+    }
+
+    .chat-product-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .chat-product-price {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    /* ── CHAT MESSAGES ── */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .msg-bubble {
+      max-width: 80%;
+      padding: 10px 13px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .msg-seller {
+      background: #f0f0f0;
+      color: #1a1a1a;
+      border-radius: 12px 12px 12px 4px;
+      align-self: flex-start;
+    }
+
+    .msg-buyer {
+      background: #1a1a1a;
+      color: #fff;
+      border-radius: 12px 12px 4px 12px;
+      align-self: flex-end;
+    }
+
+    .msg-offer-seller {
+      background: #fff8ec;
+      border: 1.5px solid #f59e0b;
+      color: #1a1a1a;
+      border-radius: 12px 12px 12px 4px;
+      align-self: flex-start;
+    }
+
+    .msg-offer-buyer {
+      background: #f0fdf4;
+      border: 1.5px solid #22c55e;
+      color: #1a1a1a;
+      border-radius: 12px 12px 4px 12px;
+      align-self: flex-end;
+    }
+
+    .msg-system {
+      background: #f0f7ff;
+      border: 1px solid #bdd0f5;
+      color: #3b5ea6;
+      border-radius: 8px;
+      align-self: center;
+      text-align: center;
+      font-size: 0.82rem;
+      max-width: 90%;
+    }
+
+    .msg-success {
+      background: #f0fdf4;
+      border: 1.5px solid #22c55e;
+      color: #166534;
+      border-radius: 8px;
+      align-self: center;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      max-width: 90%;
+    }
+
+    .msg-error {
+      background: #fff5f5;
+      border: 1.5px solid #e53e3e;
+      color: #c53030;
+      border-radius: 8px;
+      align-self: center;
+      text-align: center;
+      font-size: 0.85rem;
+      max-width: 90%;
+    }
+
+    .msg-time {
+      font-size: 0.7rem;
+      color: #aaa;
+      margin-top: 2px;
+      text-align: right;
+    }
+
+    .msg-time-left { text-align: left; }
+
+    .msg-wrapper { display: flex; flex-direction: column; }
+    .msg-wrapper.right { align-items: flex-end; }
+    .msg-wrapper.left { align-items: flex-start; }
+    .msg-wrapper.center { align-items: center; }
+
+    /* Counter-offer accept/refuse buttons */
+    .counter-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-accept {
+      flex: 1;
+      padding: 7px;
+      background: #22c55e;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn-accept:hover { opacity: 0.85; }
+
+    .btn-refuse {
+      flex: 1;
+      padding: 7px;
+      background: #fff;
+      color: #e53e3e;
+      border: 1.5px solid #e53e3e;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-refuse:hover { background: #fff5f5; }
+
+    /* ── CHAT INPUT ── */
+    .chat-input-area {
+      flex-shrink: 0;
+      padding: 12px 14px;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nego-section {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .nego-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #166534;
+      margin-bottom: 6px;
+    }
+
+    .nego-exchanges {
+      font-size: 0.75rem;
+      color: #4b7c5e;
+      margin-bottom: 6px;
+    }
+
+    .nego-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .nego-row input {
+      flex: 1;
+      padding: 8px 10px;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      outline: none;
+    }
+    .nego-row input:focus { border-color: #22c55e; }
+
+    .btn-send-offer {
+      padding: 8px 14px;
+      background: #22c55e;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+    .btn-send-offer:hover { opacity: 0.85; }
+    .btn-send-offer:disabled { opacity: 0.4; cursor: default; }
+
+    .msg-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .msg-row input {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      outline: none;
+    }
+    .msg-row input:focus { border-color: #aaa; }
+
+    .btn-send-msg {
+      padding: 9px 14px;
+      background: #5b8dee;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn-send-msg:hover { opacity: 0.85; }
+
+    /* ── TYPING INDICATOR ── */
+    .typing-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #aaa;
+      margin: 0 2px;
+      animation: typing 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* ── CART ADDED ANIMATION ── */
+    @keyframes cartPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .cart-pop { animation: cartPop 0.3s ease; }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <a class="logo" href="Index_mercato_nova.html"><span>♪</span> MERCATO NOVA</a>
+
+  <div class="search-bar">
+    <span class="icon-search">🔍</span>
+    <input type="text" placeholder="Rechercher..." />
+  </div>
+
+  <nav>
+    <a href="Index_mercato_nova.html">Accueil</a>
+    <a href="catalogue.html">Catalogue</a>
+    <a href="encheres.html">Enchères</a>
+    <a href="creation_annonce.html">Mes annonces</a>
+  </nav>
+
+  <div class="nav-icons">
+    <div class="notif-trigger">
+      <button class="nav-icon" onclick="toggleNotif()" title="Notifications">
+        🔔<span class="badge">3</span>
+      </button>
+      <div class="notif-panel" id="notifPanel">
+        <div class="notif-header">Notifications</div>
+        <div class="notif-item">
+          <span class="icon">🔨</span>
+          <div><p>Vous avez été surenchéri sur <strong>Platine Technics SL-1200</strong></p><small>Il y a 5 min</small></div>
+          <span class="notif-dot"></span>
+        </div>
+        <div class="notif-item">
+          <span class="icon">💬</span>
+          <div><p>Contre-offre reçue sur <strong>Casque Sennheiser HD600</strong></p><small>Il y a 1h</small></div>
+          <span class="notif-dot"></span>
+        </div>
+        <div class="notif-item">
+          <span class="icon">✅</span>
+          <div><p>Votre achat <strong>Daft Punk — RAM</strong> a été confirmé</p><small>Hier</small></div>
+          <span class="notif-dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <button class="nav-icon" onclick="goToCart()" title="Panier">
+      🛒<span class="badge cart-badge" id="cartBadge">0</span>
+    </button>
+    <button class="nav-icon" onclick="goToProfile()" title="Mon compte">👤</button>
+  </div>
+</header>
+
+<!-- ══ MAIN ══ -->
+<main id="mainContent">
+  <!-- Rendu dynamiquement par JS -->
+</main>
+
+<!-- ══ CHAT OVERLAY + PANEL ══ -->
+<div class="chat-overlay" id="chatOverlay" onclick="closeChat()"></div>
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-header">
+    <div class="chat-header-title" id="chatHeaderTitle">💬 Discussion</div>
+    <button class="chat-close" onclick="closeChat()">×</button>
+  </div>
+  <div class="chat-product-strip" id="chatProductStrip"></div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-input-area" id="chatInputArea"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ═══════════════════════════════════════════
+     DONNÉES PRODUITS
+  ═══════════════════════════════════════════ */
+  const PRODUCTS = [
+    { id:1,  name:"Abbey Road — Beatles",        img:"Abbey_Road.jpeg",                bg:"#e8d5b7", price:85,  type:"enchere", cat:"Vinyle",  genre:"Rock",    etat:"Excellent",     timer:"02:14:30", seller:"VinylCollector75", sellerRating:4.8, sellerSales:127, desc:"Vinyle original pressage UK de 1969, pochette en excellent état, disques sans rayure visible. Idéal pour les collectionneurs." },
+    { id:2,  name:"Daft Punk — RAM",              img:"daft-punk-ram.jpeg",             bg:"#d5d5e8", price:35,  type:"achat",   cat:"Vinyle",  genre:"Electro", etat:"Bon état",      timer:null,       seller:"VinylCollector75", sellerRating:4.8, sellerSales:127, desc:"Vinyle 2xLP en bon état, pochette originale, disques sans rayure. Édition 2013. Livraison soignée." },
+    { id:3,  name:"Platine Technics SL-1200",     img:"Platine Technics SL-1200.jpeg",  bg:"#d0d0d0", price:320, type:"nego",    cat:"Platine", genre:null,      etat:"Excellent",     timer:null,       seller:"VinylCollector75", sellerRating:4.8, sellerSales:127, desc:"Platine professionnelle DJ en excellent état, courroie neuve, plateau équilibré. Prix indicatif, négociation possible." },
+    { id:4,  name:"Kind of Blue — Miles Davis",   img:"kind-of-blue.jpeg",              bg:"#c8daf0", price:45,  type:"enchere", cat:"Vinyle",  genre:"Jazz",    etat:"Bon état",      timer:"05:00:00", seller:"VinylCollector75", sellerRating:4.8, sellerSales:127, desc:"Pressage CBS des années 70, superbe état. Très belle sonorité." },
+    { id:5,  name:"Casque Sennheiser HD600",      img:"sennheiser-hd600.jpg",           bg:"#d0d0d0", price:180, type:"nego",    cat:"Casque",  genre:null,      etat:"Excellent",     timer:null,       seller:"VinylCollector75", sellerRating:4.8, sellerSales:127, desc:"Casque audiophile haute gamme, état excellent, coussinets remplacés. Open-back, impédance 300Ω." },
+    { id:6,  name:"Lot Jazz vinyles",             img:"vinyles-jazz.webp",              bg:"#fce4b0", price:60,  type:"achat",   cat:"Vinyle",  genre:"Jazz",    etat:"Correct",       timer:null,       seller:"VinylCollector75", sellerRating:4.8, sellerSales:127, desc:"Lot de 20 vinyles Jazz des années 50 à 80. Coltrane, Davis, Monk, Rollins... États variables." },
+    { id:7,  name:"Ampli Marantz 2270",           img:"marantz-2270.jpg",               bg:"#e0d0c0", price:550, type:"enchere", cat:"Ampli",   genre:null,      etat:"Bon état",      timer:"01:20:00", seller:"VinylCollector75", sellerRating:4.8, sellerSales:127, desc:"Ampli stéréo vintage 1975, révisé et reconditionné, 70W/canal. Son chaleureux et puissant." },
+    { id:8,  name:"Enceintes JBL L100",           img:"jbl-l100.png",                   bg:"#c8d8c8", price:450, type:"achat",   cat:"Enceinte",genre:null,      etat:"Excellent",     timer:null,       seller:"VinylCollector75", sellerRating:4.8, sellerSales:127, desc:"Enceintes bookshelf iconiques des années 70, haut-parleurs d'origine en parfait état." },
+    { id:9,  name:"Abbey Road — éd. anniversaire",img:"Abbey_Road.jpeg",                bg:"#f0e8d0", price:120, type:"nego",    cat:"Vinyle",  genre:"Rock",    etat:"Neuf / Scellé", timer:null,       seller:"VinylCollector75", sellerRating:4.8, sellerSales:127, desc:"Réédition 50ème anniversaire, encore scellée. Mastering par Giles Martin." },
+    { id:10, name:"Kind of Blue — 1ère press.",   img:"kind-of-blue.jpeg",              bg:"#d0e0f0", price:210, type:"enchere", cat:"Vinyle",  genre:"Jazz",    etat:"Excellent",     timer:"03:30:00", seller:"VinylCollector75", sellerRating:4.8, sellerSales:127, desc:"Très rare première pression américaine Columbia, 1959. Matrice 6-eye." },
+    { id:11, name:"Casque HD600 Pro",             img:"sennheiser-hd600.jpg",           bg:"#e0e0e0", price:220, type:"achat",   cat:"Casque",  genre:null,      etat:"Neuf / Scellé", timer:null,       seller:"VinylCollector75", sellerRating:4.8, sellerSales:127, desc:"Casque Sennheiser HD600 neuf, encore scellé dans sa boîte d'origine avec tous les accessoires." },
+    { id:12, name:"Platine Technics — MK2",       img:"Platine Technics SL-1200.jpeg",  bg:"#d8d8d8", price:480, type:"nego",    cat:"Platine", genre:null,      etat:"Bon état",      timer:null,       seller:"VinylCollector75", sellerRating:4.8, sellerSales:127, desc:"Édition MK2 révisée complètement, courroie et câbles remplacés, plateau reverni." },
+  ];
+
+  /* ═══════════════════════════════════════════
+     ÉTAT GLOBAL
+  ═══════════════════════════════════════════ */
+  let product = null;
+  let currentBid = 0;
+  let bidHistory = [];
+  let qty = 1;
+  let isFav = false;
+  let timerSecs = 0;
+  let timerInterval = null;
+
+  // État négociation
+  let negoState = 'idle'; // idle | waiting | countered | done
+  let negoExchanges = 0;
+  const MAX_EXCHANGES = 5;
+  let agreedPrice = null;
+
+  /* ═══════════════════════════════════════════
+     INIT PAGE
+  ═══════════════════════════════════════════ */
+  function init() {
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get('id'));
+    product = PRODUCTS.find(p => p.id === id);
+
+    if (!product) {
+      document.getElementById('mainContent').innerHTML = `
+        <div style="text-align:center;padding:60px 20px;color:#888;">
+          <div style="font-size:2.5rem;margin-bottom:12px;">🔍</div>
+          <p style="font-size:1rem;margin-bottom:16px;">Article introuvable.</p>
+          <a href="catalogue.html" style="color:#5b8dee;font-weight:700;text-decoration:none;">← Retour au catalogue</a>
+        </div>`;
+      return;
+    }
+
+    currentBid = product.price;
+    if (product.timer) timerSecs = parseTime(product.timer);
+
+    renderPage();
+    updateCartBadge();
+
+    if (product.type === 'enchere' && timerSecs > 0) startTimer();
+  }
+
+  /* ═══════════════════════════════════════════
+     RENDER PAGE
+  ═══════════════════════════════════════════ */
+  function renderPage() {
+    const typeLabel = { enchere: 'Enchère', achat: 'Achat immédiat', nego: 'Négociable' };
+    const typeClass = { enchere: 'badge-enchere', achat: 'badge-achat', nego: 'badge-nego' };
+    const sub = [product.cat, product.genre, product.etat].filter(Boolean).join(' — ');
+    const catLabel = product.cat || 'Produits';
+
+    document.title = `${product.name} — Mercato Nova`;
+
+    document.getElementById('mainContent').innerHTML = `
+      <div class="breadcrumb">
+        <a href="Index_mercato_nova.html">Accueil</a> ›
+        <a href="catalogue.html">Catalogue</a> ›
+        <a href="catalogue.html">${product.cat || 'Produits'}</a> ›
+        <span>${product.name}</span>
+      </div>
+
+      <div class="article-layout">
+
+        <!-- Galerie -->
+        <div class="article-gallery">
+          <div class="main-img-wrapper" style="background:${product.bg}">
+            <img id="mainImg" src="${product.img}" alt="${product.name}" onerror="this.style.display='none'" />
+          </div>
+        </div>
+
+        <!-- Infos -->
+        <div class="article-info">
+          <span class="type-badge ${typeClass[product.type]}">${typeLabel[product.type]}</span>
+          <h1 class="article-title">${product.name}</h1>
+          <div class="article-sub">${sub}</div>
+
+          <div class="article-seller">
+            <span>Vendeur :</span>
+            <a href="profil_utilisateur.html"><strong>${product.seller}</strong></a>
+            <span class="seller-rating">⭐ ${product.sellerRating} (${product.sellerSales} ventes)</span>
+          </div>
+
+          <!-- Section prix dynamique -->
+          <div class="price-section" id="priceSection"></div>
+
+          <!-- Actions -->
+          <div class="article-actions" id="articleActions"></div>
+
+          <!-- Description -->
+          <div class="article-desc">
+            <div class="desc-title">Description</div>
+            <div class="desc-text">${product.desc}</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    renderPriceSection();
+    renderActions();
+  }
+
+  function renderPriceSection() {
+    const section = document.getElementById('priceSection');
+    if (!section) return;
+
+    if (product.type === 'enchere') {
+      bidHistory = [
+        { user: 'Acheteur anonyme', price: product.price - 10, time: 'Il y a 2h' },
+        { user: 'Acheteur anonyme', price: product.price, time: 'Il y a 5 min' },
+      ];
+      section.innerHTML = `
+        <div class="enchere-box">
+          <div class="enchere-timer" id="enchTimer">⏱ ${formatTime(timerSecs)}</div>
+          <div class="enchere-current">Enchère actuelle : <strong id="currentBidDisplay">${currentBid},00 €</strong></div>
+          <div class="bid-row">
+            <input type="number" id="bidInput" placeholder="Votre mise (min. ${currentBid + 1} €)" min="${currentBid + 1}" step="1" />
+            <button class="btn-bid" onclick="placeBid()">Enchérir</button>
+          </div>
+          <div class="bid-hint">Mise minimum : <strong>${currentBid + 1} €</strong></div>
+          <div class="bid-history" id="bidHistory">
+            ${bidHistory.map(b => `
+              <div class="bid-history-item">
+                <span>${b.user}</span>
+                <span>${b.price} €</span>
+                <span style="color:#aaa">${b.time}</span>
+              </div>`).join('')}
+          </div>
+        </div>
+      `;
+    } else if (product.type === 'nego') {
+      section.innerHTML = `
+        <div class="price-main">${product.price},00 €</div>
+        <div class="price-label">Prix indicatif — négociation possible</div>
+        <div class="nego-quick">
+          <div class="nego-quick-label">💬 Proposer un autre prix ?</div>
+          <div style="font-size:0.82rem;color:#555;">Ouvrez la discussion pour négocier directement avec le vendeur.</div>
+        </div>
+      `;
+    } else {
+      section.innerHTML = `
+        <div class="price-main">${product.price},00 €</div>
+        <div class="price-label">Prix fixe</div>
+        <div class="qty-row">
+          <span class="qty-label">Quantité :</span>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <span class="qty-val" id="qtyDisplay">1</span>
+            <button class="qty-btn" onclick="changeQty(+1)">+</button>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  function renderActions() {
+    const container = document.getElementById('articleActions');
+    if (!container) return;
+
+    const cartLabel = product.type === 'enchere' ? '🛒 Suivre / Panier' : '🛒 Ajouter au panier';
+    const chatLabel = product.type === 'nego'
+      ? '💬 Négocier avec le vendeur'
+      : '💬 Contacter le vendeur';
+
+    container.innerHTML = `
+      <button class="btn-cart" onclick="addToCart()">${cartLabel}</button>
+      <button class="btn-fav" id="favBtn" onclick="toggleFav()">♡ Ajouter aux favoris</button>
+      <button class="btn-chat" onclick="openChat()">${chatLabel}</button>
+    `;
+  }
+
+  /* ═══════════════════════════════════════════
+     TIMER (ENCHÈRES)
+  ═══════════════════════════════════════════ */
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      timerSecs = Math.max(0, timerSecs - 1);
+      const el = document.getElementById('enchTimer');
+      if (el) {
+        el.textContent = '⏱ ' + formatTime(timerSecs);
+        el.style.color = timerSecs < 600 ? '#e53e3e' : timerSecs < 3600 ? '#d97706' : '#555';
+      }
+      if (timerSecs === 0) {
+        clearInterval(timerInterval);
+        if (el) el.textContent = '⏱ Enchère terminée';
+      }
+    }, 1000);
+  }
+
+  function parseTime(t) {
+    const [h, m, s] = t.split(':').map(Number);
+    return h * 3600 + m * 60 + s;
+  }
+
+  function formatTime(secs) {
+    if (secs <= 0) return 'Terminée';
+    const h = String(Math.floor(secs / 3600)).padStart(2, '0');
+    const m = String(Math.floor((secs % 3600) / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  }
+
+  /* ═══════════════════════════════════════════
+     ENCHÈRE
+  ═══════════════════════════════════════════ */
+  function placeBid() {
+    const input = document.getElementById('bidInput');
+    const bid = parseFloat(input.value);
+    if (!bid || bid <= currentBid) {
+      showToast(`Mise minimum : ${currentBid + 1} €`);
+      return;
+    }
+    currentBid = bid;
+    const user = JSON.parse(localStorage.getItem('mn_currentUser') || 'null');
+    const pseudo = user ? user.pseudo : 'Vous';
+
+    bidHistory.unshift({ user: pseudo, price: bid, time: 'À l\'instant' });
+
+    document.getElementById('currentBidDisplay').textContent = `${bid},00 €`;
+    document.getElementById('bidHistory').innerHTML = bidHistory.map(b => `
+      <div class="bid-history-item">
+        <span>${b.user}</span>
+        <span style="font-weight:600">${b.price} €</span>
+        <span style="color:#aaa">${b.time}</span>
+      </div>`).join('');
+
+    const hint = document.querySelector('.bid-hint');
+    if (hint) hint.innerHTML = `Mise minimum : <strong>${currentBid + 1} €</strong>`;
+    input.placeholder = `Votre mise (min. ${currentBid + 1} €)`;
+    input.min = currentBid + 1;
+    input.value = '';
+
+    showToast(`Enchère placée à ${bid} € !`);
+  }
+
+  /* ═══════════════════════════════════════════
+     QUANTITÉ
+  ═══════════════════════════════════════════ */
+  function changeQty(delta) {
+    qty = Math.max(1, Math.min(10, qty + delta));
+    const el = document.getElementById('qtyDisplay');
+    if (el) el.textContent = qty;
+  }
+
+  /* ═══════════════════════════════════════════
+     PANIER
+  ═══════════════════════════════════════════ */
+  function addToCart() {
+    const cart = JSON.parse(localStorage.getItem('mn_cart') || '[]');
+    const price = agreedPrice !== null ? agreedPrice : (product.type === 'enchere' ? currentBid : product.price);
+    const q = product.type === 'achat' ? qty : 1;
+
+    const existing = cart.find(i => i.id === product.id);
+    if (existing) {
+      existing.qty += q;
+    } else {
+      cart.push({ id: product.id, name: product.name, price, qty: q, img: product.img, type: product.type });
+    }
+    localStorage.setItem('mn_cart', JSON.stringify(cart));
+
+    updateCartBadge();
+
+    const btn = document.querySelector('.btn-cart');
+    if (btn) btn.classList.add('cart-pop');
+    setTimeout(() => btn?.classList.remove('cart-pop'), 300);
+
+    const label = product.type === 'enchere' ? 'Enchère sauvegardée dans le panier !' : `${product.name} ajouté au panier !`;
+    showToast(label);
+  }
+
+  function updateCartBadge() {
+    const cart = JSON.parse(localStorage.getItem('mn_cart') || '[]');
+    const total = cart.reduce((s, i) => s + i.qty, 0);
+    const badge = document.getElementById('cartBadge');
+    if (badge) {
+      badge.textContent = total;
+      badge.style.display = total > 0 ? 'flex' : 'none';
+    }
+  }
+
+  /* ═══════════════════════════════════════════
+     FAVORIS
+  ═══════════════════════════════════════════ */
+  function toggleFav() {
+    isFav = !isFav;
+    const btn = document.getElementById('favBtn');
+    if (btn) {
+      btn.textContent = isFav ? '♥ Dans vos favoris' : '♡ Ajouter aux favoris';
+      btn.classList.toggle('active', isFav);
+    }
+    showToast(isFav ? 'Ajouté aux favoris !' : 'Retiré des favoris');
+  }
+
+  /* ═══════════════════════════════════════════
+     CHAT / NÉGOCIATION
+  ═══════════════════════════════════════════ */
+  function openChat() {
+    document.getElementById('chatOverlay').classList.add('open');
+    document.getElementById('chatPanel').classList.add('open');
+
+    // En-tête panel
+    document.getElementById('chatHeaderTitle').textContent = `💬 Discussion avec ${product.seller}`;
+
+    // Strip produit
+    document.getElementById('chatProductStrip').innerHTML = `
+      <img src="${product.img}" onerror="this.style.opacity='0'" />
+      <div>
+        <div class="chat-product-name">${product.name}</div>
+        <div class="chat-product-price">${product.type === 'enchere' ? currentBid + ' € (enchère actuelle)' : product.price + ' €'}</div>
+      </div>
+    `;
+
+    // Messages initiaux (seulement la première fois)
+    const msgs = document.getElementById('chatMessages');
+    if (msgs.children.length === 0) {
+      const greetings = {
+        achat: `Bonjour ! Ce produit est disponible au prix fixe de ${product.price} €. N'hésitez pas si vous avez des questions !`,
+        enchere: `Bonjour ! Vous participez à cette enchère. N'hésitez pas si vous voulez des informations supplémentaires sur l'article.`,
+        nego: `Bonjour ! Le prix affiché (${product.price} €) est indicatif. Je suis ouvert à la négociation. Quelle est votre offre ?`,
+      };
+      addMessage('seller', greetings[product.type]);
+    }
+
+    // Zone d'input
+    renderChatInput();
+    scrollChat();
+  }
+
+  function closeChat() {
+    document.getElementById('chatOverlay').classList.remove('open');
+    document.getElementById('chatPanel').classList.remove('open');
+  }
+
+  function renderChatInput() {
+    const area = document.getElementById('chatInputArea');
+
+    let negoHtml = '';
+    if (product.type === 'nego' && negoState !== 'done') {
+      const remaining = MAX_EXCHANGES - negoExchanges;
+      negoHtml = `
+        <div class="nego-section" id="negoSection">
+          <div class="nego-label">Proposer un prix</div>
+          <div class="nego-exchanges">${remaining} échange${remaining > 1 ? 's' : ''} restant${remaining > 1 ? 's' : ''} (max ${MAX_EXCHANGES})</div>
+          <div class="nego-row">
+            <input type="number" id="offerInput" placeholder="Ex: ${Math.round(product.price * 0.85)} €" min="1" step="1" />
+            <button class="btn-send-offer" onclick="sendOffer()" id="offerBtn" ${negoState === 'waiting' || negoState === 'countered' ? '' : ''}>
+              Envoyer l'offre
+            </button>
+          </div>
+        </div>
+      `;
+    } else if (product.type === 'nego' && negoState === 'done' && agreedPrice !== null) {
+      negoHtml = `
+        <div class="nego-section" style="background:#f0fdf4;border-color:#22c55e;">
+          <div style="font-size:0.85rem;font-weight:700;color:#166534;margin-bottom:8px;">✅ Accord conclu à ${agreedPrice} €</div>
+          <button class="btn-cart" onclick="addToCart(); closeChat();" style="font-size:0.85rem;padding:9px;">🛒 Ajouter au panier au prix négocié</button>
+        </div>
+      `;
+    }
+
+    area.innerHTML = `
+      ${negoHtml}
+      <div class="msg-row">
+        <input type="text" id="msgInput" placeholder="Votre message..." onkeydown="if(event.key==='Enter')sendMessage()" />
+        <button class="btn-send-msg" onclick="sendMessage()">→</button>
+      </div>
+    `;
+  }
+
+  function addMessage(side, text, cls = null) {
+    const msgs = document.getElementById('chatMessages');
+    const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+    const wrapper = document.createElement('div');
+    wrapper.className = `msg-wrapper ${side === 'buyer' || side === 'offer-buyer' ? 'right' : side === 'system' || side === 'success' || side === 'error' ? 'center' : 'left'}`;
+
+    const bubble = document.createElement('div');
+    const cssClass = cls || (
+      side === 'seller' ? 'msg-seller' :
+      side === 'buyer' ? 'msg-buyer' :
+      side === 'offer-seller' ? 'msg-offer-seller' :
+      side === 'offer-buyer' ? 'msg-offer-buyer' :
+      side === 'success' ? 'msg-success' :
+      side === 'error' ? 'msg-error' :
+      'msg-system'
+    );
+    bubble.className = `msg-bubble ${cssClass}`;
+    bubble.innerHTML = text;
+    wrapper.appendChild(bubble);
+
+    if (side !== 'system' && side !== 'success' && side !== 'error') {
+      const timeEl = document.createElement('div');
+      timeEl.className = `msg-time ${side === 'seller' || side === 'offer-seller' ? 'msg-time-left' : ''}`;
+      timeEl.textContent = now;
+      wrapper.appendChild(timeEl);
+    }
+
+    msgs.appendChild(wrapper);
+    scrollChat();
+    return wrapper;
+  }
+
+  function scrollChat() {
+    const msgs = document.getElementById('chatMessages');
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  /* ── Envoyer un message texte ── */
+  function sendMessage() {
+    const input = document.getElementById('msgInput');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+
+    addMessage('buyer', text);
+    addMessage('system', 'Message envoyé — en attente de la réponse du vendeur.');
+  }
+
+  /* ── Envoyer une offre de négociation ── */
+  function sendOffer() {
+    if (product.type !== 'nego') return;
+    if (negoExchanges >= MAX_EXCHANGES) {
+      showToast('Nombre maximum d\'échanges atteint.');
+      return;
+    }
+
+    const input = document.getElementById('offerInput');
+    const offer = parseFloat(input.value);
+    if (!offer || offer <= 0) {
+      showToast('Veuillez saisir un montant valide.');
+      return;
+    }
+    if (offer > product.price) {
+      showToast('L\'offre ne peut pas dépasser le prix demandé.');
+      return;
+    }
+    input.value = '';
+
+    negoExchanges++;
+    negoState = 'waiting';
+    addMessage('offer-buyer', `💰 Offre proposée : <strong>${offer} €</strong>`);
+    addMessage('system', 'Offre envoyée — en attente de la réponse du vendeur.');
+    renderChatInput();
+    scrollChat();
+  }
+
+  /* ═══════════════════════════════════════════
+     NAVIGATION
+  ═══════════════════════════════════════════ */
+  function goToProfile() {
+    window.location.href = 'Creationprofile.html';
+  }
+
+  function goToCart() {
+    window.location.href = 'panier.html';
+  }
+
+  /* ═══════════════════════════════════════════
+     TOAST & NOTIFICATIONS
+  ═══════════════════════════════════════════ */
+  let toastTimer = null;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function toggleNotif() {
+    document.getElementById('notifPanel').classList.toggle('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    const trigger = document.querySelector('.notif-trigger');
+    if (trigger && !trigger.contains(e.target)) {
+      document.getElementById('notifPanel').classList.remove('open');
+    }
+  });
+
+  /* ─── LANCEMENT ─── */
+  init();
+</script>
+
+</body>
+</html>
