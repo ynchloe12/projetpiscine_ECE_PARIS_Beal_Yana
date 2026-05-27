@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profil — Mercato Nova</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #1a1a1a;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .logo span { font-size: 1.4rem; }
+
+    .search-bar {
+      flex: 1;
+      max-width: 380px;
+      margin-left: auto;
+      position: relative;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 8px 14px 8px 36px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      background: #f2f2f2;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar input:focus { border-color: #a0a0a0; background: #fff; }
+
+    .search-bar .icon-search {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #1a1a1a;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+
+    nav a:hover { background: #f0f0f0; }
+
+    .nav-icons {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .nav-icon {
+      position: relative;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      color: #1a1a1a;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-icon:hover { background: #f0f0f0; }
+
+    .badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: #e53e3e;
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      border-radius: 999px;
+      min-width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
+    }
+
+    .notif-trigger { position: relative; }
+
+    .notif-panel {
+      position: absolute;
+      top: 52px;
+      right: 0;
+      width: 300px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+      display: none;
+      z-index: 200;
+      overflow: hidden;
+    }
+
+    .notif-panel.open { display: block; }
+
+    .notif-header {
+      padding: 12px 16px;
+      font-weight: 700;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.95rem;
+    }
+
+    .notif-item {
+      display: flex;
+      gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #f8f8f8;
+      font-size: 0.84rem;
+      align-items: flex-start;
+      transition: background 0.1s;
+    }
+
+    .notif-item:hover { background: #fafafa; }
+    .notif-item .icon { font-size: 1.1rem; margin-top: 1px; }
+    .notif-item p { line-height: 1.4; }
+    .notif-item small { color: #888; }
+    .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; margin-top: 5px; flex-shrink: 0; }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 860px;
+      margin: 40px auto;
+      padding: 0 16px 48px;
+    }
+
+    /* ── PROFILE CARD ── */
+    .profile-card {
+      background: #fff;
+      border: 2px solid #5b8dee;
+      border-radius: 12px;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── LEFT PANEL ── */
+    .profile-left {
+      width: 200px;
+      flex-shrink: 0;
+      padding: 32px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border-right: 1px solid #e8e8e8;
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #d0d0d0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: #555;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-username {
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .profile-since {
+      font-size: 0.8rem;
+      color: #888;
+      text-align: center;
+    }
+
+    .profile-rating {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      text-align: center;
+    }
+
+    .btn-edit-profile {
+      margin-top: 6px;
+      padding: 8px 18px;
+      border: 1.5px solid #1a1a1a;
+      border-radius: 6px;
+      background: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn-edit-profile:hover {
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .profile-right {
+      flex: 1;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── FORM SECTION ── */
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      font-size: 0.82rem;
+      color: #555;
+    }
+
+    .form-group input {
+      padding: 9px 12px;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      background: #fafafa;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: #5b8dee;
+      background: #fff;
+    }
+
+    .btn-save {
+      padding: 10px 24px;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      align-self: flex-start;
+    }
+
+    .btn-save:hover { opacity: 0.8; }
+
+    /* ── AVATAR UPLOAD ── */
+    .avatar-wrapper {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #d0d0d0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: #555;
+      overflow: hidden;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-overlay {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+      font-size: 1.3rem;
+    }
+
+    .avatar-wrapper:hover .avatar-overlay { opacity: 1; }
+
+    #avatarInput { display: none; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .profile-card { flex-direction: column; }
+      .profile-left { width: 100%; border-right: none; border-bottom: 1px solid #e8e8e8; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+      .profile-right { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <a class="logo" href="Index_mercato_nova.html">
+    <span>♪</span> MERCATO NOVA
+  </a>
+
+  <div class="search-bar">
+    <span class="icon-search">🔍</span>
+    <input type="text" placeholder="Rechercher..." />
+  </div>
+
+  <nav>
+    <a href="catalogue.html">Catalogue</a>
+    <a href="#">Enchères</a>
+  </nav>
+
+  <div class="nav-icons">
+    <div class="notif-trigger">
+      <button class="nav-icon" onclick="toggleNotif()" title="Notifications">
+        🔔
+        <span class="badge">3</span>
+      </button>
+      <div class="notif-panel" id="notifPanel">
+        <div class="notif-header">Notifications</div>
+        <div class="notif-item">
+          <span class="icon">🔨</span>
+          <div>
+            <p>Vous avez été surenchéri sur <strong>Platine Technics SL-1200</strong></p>
+            <small>Il y a 5 min</small>
+          </div>
+          <span class="notif-dot"></span>
+        </div>
+        <div class="notif-item">
+          <span class="icon">💬</span>
+          <div>
+            <p>Contre-offre reçue sur <strong>Casque Sennheiser HD600</strong></p>
+            <small>Il y a 1h</small>
+          </div>
+          <span class="notif-dot"></span>
+        </div>
+        <div class="notif-item">
+          <span class="icon">✅</span>
+          <div>
+            <p>Votre achat <strong>Daft Punk — RAM</strong> a été confirmé</p>
+            <small>Hier</small>
+          </div>
+          <span class="notif-dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <button class="nav-icon" title="Panier">🛒<span class="badge">1</span></button>
+    <button class="nav-icon" title="Mon compte" style="background:#f0f0f0;">👤</button>
+  </div>
+</header>
+
+<!-- ══ MAIN ══ -->
+<main>
+  <div class="profile-card">
+
+    <!-- Panneau gauche -->
+    <div class="profile-left">
+      <div class="avatar-wrapper" onclick="document.getElementById('avatarInput').click()" title="Changer la photo">
+        <div class="avatar" id="avatarEl">
+          <span id="avatarIcon">👤</span>
+        </div>
+        <div class="avatar-overlay">📷</div>
+      </div>
+      <input type="file" id="avatarInput" accept="image/*" onchange="previewAvatar(event)" />
+      <div class="profile-username" id="displayUsername">VinylCollector75</div>
+      <div class="profile-since">Membre depuis jan. 2025</div>
+      <button class="btn-edit-profile" onclick="toggleEdit()">Modifier le profil</button>
+    </div>
+
+    <!-- Panneau droit -->
+    <div class="profile-right">
+
+      <!-- Informations -->
+      <div>
+        <div class="section-title">Informations</div>
+
+        <div class="form-group">
+          <label for="inputPseudo">Pseudo</label>
+          <input type="text" id="inputPseudo" value="VinylCollector75" disabled />
+        </div>
+
+        <div class="form-group">
+          <label for="inputEmail">Email</label>
+          <input type="email" id="inputEmail" value="vinyl75@exemple.com" disabled />
+        </div>
+
+        <div class="form-group">
+          <label for="inputAdresse">Adresse de livraison</label>
+          <input type="text" id="inputAdresse" value="12 rue de la Musique, 75011 Paris" disabled />
+        </div>
+
+        <div class="form-group">
+          <label for="inputMdp">Mot de passe (modifier)</label>
+          <input type="password" id="inputMdp" placeholder="••••••••" disabled />
+        </div>
+
+        <button class="btn-save" id="btnSave" style="display:none;" onclick="saveProfile()">Enregistrer</button>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast">Profil enregistré !</div>
+
+<script>
+  let editMode = false;
+  let pendingAvatarFile = null;
+
+  /* ── PHOTO DE PROFIL ── */
+  function previewAvatar(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    pendingAvatarFile = file;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const avatarEl = document.getElementById('avatarEl');
+      avatarEl.innerHTML = `<img src="${e.target.result}" alt="Photo de profil" />`;
+    };
+    reader.readAsDataURL(file);
+    showToast('Photo sélectionnée — cliquez sur Enregistrer pour sauvegarder');
+
+    // Active le mode édition si pas déjà actif, pour forcer un save
+    if (!editMode) toggleEdit();
+  }
+
+  /* ── ÉDITION ── */
+  function toggleEdit() {
+    editMode = !editMode;
+    const inputs = document.querySelectorAll('#inputPseudo, #inputEmail, #inputAdresse, #inputMdp');
+    const btn = document.getElementById('btnSave');
+    const editBtn = document.querySelector('.btn-edit-profile');
+
+    inputs.forEach(input => {
+      input.disabled = !editMode;
+      input.style.background = editMode ? '#fff' : '#fafafa';
+    });
+
+    btn.style.display = editMode ? 'inline-block' : 'none';
+    editBtn.textContent = editMode ? 'Annuler' : 'Modifier le profil';
+
+    if (!editMode) pendingAvatarFile = null;
+  }
+
+  /* ── SAUVEGARDE ── */
+  function saveProfile() {
+    const pseudo = document.getElementById('inputPseudo').value.trim();
+    const email  = document.getElementById('inputEmail').value.trim();
+    const adresse = document.getElementById('inputAdresse').value.trim();
+    const mdp    = document.getElementById('inputMdp').value;
+
+    if (pseudo) document.getElementById('displayUsername').textContent = pseudo;
+
+    // TODO: remplacer par un appel fetch vers la base de données
+    // Exemple futur :
+    // const formData = new FormData();
+    // formData.append('pseudo', pseudo);
+    // formData.append('email', email);
+    // formData.append('adresse', adresse);
+    // if (mdp) formData.append('password', mdp);
+    // if (pendingAvatarFile) formData.append('avatar', pendingAvatarFile);
+    // await fetch('/api/profil', { method: 'POST', body: formData });
+
+    pendingAvatarFile = null;
+    toggleEdit();
+    showToast('Profil enregistré !');
+  }
+
+  /* ── TOAST ── */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  /* ── NOTIFICATIONS ── */
+  function toggleNotif() {
+    document.getElementById('notifPanel').classList.toggle('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    const trigger = document.querySelector('.notif-trigger');
+    if (trigger && !trigger.contains(e.target)) {
+      document.getElementById('notifPanel').classList.remove('open');
+    }
+  });
+</script>
+
+</body>
+</html>
