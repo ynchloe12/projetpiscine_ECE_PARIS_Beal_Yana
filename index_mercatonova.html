@@ -308,8 +308,9 @@
   </div>
 
   <nav>
-    <a href="#">Catalogue</a>
-    <a href="#">Enchères</a>
+    <a href="catalogue.html">Catalogue</a>
+    <a href="encheres.html">Enchères</a>
+    <a href="creation_annonce.html">Mes annonces</a>
   </nav>
 
   <div class="nav-icons">
@@ -349,13 +350,13 @@
     </div>
 
     <!-- Panier -->
-    <button class="nav-icon" onclick="alert('Panier — à venir')" title="Panier">
+    <button class="nav-icon" onclick="window.location.href='panier.html'" title="Panier">
       🛒
-      <span class="badge">1</span>
+      <span class="badge" id="cartBadge" style="display:none">0</span>
     </button>
 
     <!-- Compte -->
-    <button class="nav-icon" onclick="alert('Mon compte — à venir')" title="Mon compte">
+    <button class="nav-icon" onclick="goToProfile()" title="Mon compte">
       👤
     </button>
   </div>
@@ -468,17 +469,18 @@
   }
 
   /* ── ACTIONS ── */
-  function openProduct(id) { alert(`Fiche produit #${id} — à venir`); }
+  function openProduct(id) {
+    window.location.href = `article.html?id=${id}`;
+  }
 
   function enchereClick(e, id) {
     e.stopPropagation();
-    alert(`Placer une enchère sur le produit #${id} — à venir`);
+    window.location.href = `article.html?id=${id}`;
   }
 
   function transactionClick(e, id, type) {
     e.stopPropagation();
-    const label = type === "nego" ? "Négocier" : "Acheter";
-    alert(`${label} le produit #${id} — à venir`);
+    window.location.href = `article.html?id=${id}`;
   }
 
   /* ── NOTIFICATIONS ── */
@@ -519,11 +521,26 @@
     });
   }
 
+  /* ── NAVIGATION COMPTE ── */
+  function goToProfile() {
+    window.location.href = 'Creationprofile.html';
+  }
+
+  /* ── PANIER BADGE ── */
+  function updateCartBadge() {
+    const cart = JSON.parse(localStorage.getItem('mn_cart') || '[]');
+    const total = cart.reduce((s, i) => s + i.qty, 0);
+    const badge = document.getElementById('cartBadge');
+    badge.textContent = total;
+    badge.style.display = total > 0 ? 'flex' : 'none';
+  }
+
   /* ── INIT ── */
   renderEncheres(encheres);
   renderRecents(recents);
   renderCategories();
   setInterval(tickTimers, 1000);
+  updateCartBadge();
 </script>
 
 </body>
