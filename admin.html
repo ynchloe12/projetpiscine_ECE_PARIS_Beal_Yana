@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administration — Mercato Nova</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a1a1a; }
+
+    /* ── SIDEBAR ── */
+    .layout { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      width: 220px;
+      background: #1a1a1a;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 200;
+    }
+
+    .sidebar-logo {
+      padding: 20px 18px 16px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .sidebar-logo small { display: block; font-size: 0.68rem; color: #888; font-weight: 400; letter-spacing: 0.3px; margin-top: 2px; }
+
+    .sidebar-menu { padding: 12px 0; flex: 1; }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      font-size: 0.88rem;
+      color: #aaa;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      border-left: 3px solid transparent;
+    }
+    .menu-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .menu-item.active { background: rgba(255,255,255,0.1); color: #fff; border-left-color: #f59e0b; font-weight: 600; }
+    .menu-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      padding: 14px 18px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.78rem;
+      color: #666;
+    }
+    .sidebar-footer a { color: #aaa; text-decoration: none; display: block; margin-bottom: 4px; }
+    .sidebar-footer a:hover { color: #fff; }
+
+    /* ── MAIN ── */
+    .main { margin-left: 220px; flex: 1; }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0 28px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-title { font-size: 1rem; font-weight: 700; }
+    .topbar-user { font-size: 0.85rem; color: #555; display: flex; align-items: center; gap: 8px; }
+    .admin-badge { background: #e53e3e; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 999px; }
+
+    .content { padding: 28px; }
+
+    /* ── STATS ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .stat-card {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .stat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .stat-card-icon { font-size: 1.3rem; }
+    .stat-card-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.4px; }
+    .stat-card-value { font-size: 1.8rem; font-weight: 800; }
+    .stat-card-sub { font-size: 0.75rem; color: #888; margin-top: 2px; }
+
+    /* ── SECTION ── */
+    .section {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .section-title { font-size: 0.95rem; font-weight: 700; }
+    .section-search { padding: 7px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.85rem; outline: none; width: 200px; }
+    .section-search:focus { border-color: #aaa; }
+
+    /* TABLE */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table thead th {
+      padding: 10px 16px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #888;
+      text-align: left;
+      background: #fafafa;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .data-table tbody tr { border-bottom: 1px solid #f5f5f5; transition: background 0.1s; }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table tbody tr:hover { background: #fafafa; }
+    .data-table td { padding: 12px 16px; font-size: 0.86rem; vertical-align: middle; }
+
+    /* Badges */
+    .badge-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .bp-green  { background: #dcfce7; color: #166534; }
+    .bp-red    { background: #fee2e2; color: #991b1b; }
+    .bp-amber  { background: #fef3c7; color: #92400e; }
+    .bp-blue   { background: #dbeafe; color: #1e40af; }
+    .bp-gray   { background: #f3f4f6; color: #6b7280; }
+    .bp-black  { background: #1a1a1a; color: #fff; }
+
+    /* Action buttons */
+    .action-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid;
+      transition: background 0.15s;
+    }
+    .ab-block  { color: #e53e3e; border-color: #e53e3e; background: #fff; }
+    .ab-block:hover  { background: #fff5f5; }
+    .ab-unblock { color: #22c55e; border-color: #22c55e; background: #fff; }
+    .ab-unblock:hover { background: #f0fdf4; }
+    .ab-delete { color: #e53e3e; border-color: #e53e3e; background: #fff; }
+    .ab-delete:hover { background: #fff5f5; }
+    .ab-approve { color: #22c55e; border-color: #22c55e; background: #fff; }
+    .ab-approve:hover { background: #f0fdf4; }
+
+    .actions-cell { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* Empty */
+    .table-empty { padding: 40px 20px; text-align: center; color: #aaa; font-size: 0.9rem; }
+
+    /* ── LOGIN GATE ── */
+    .login-gate {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #f0f2f5;
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-gate.visible { display: flex; }
+    .login-gate-box {
+      background: #fff;
+      border-radius: 14px;
+      padding: 40px 36px;
+      max-width: 340px;
+      width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      text-align: center;
+    }
+    .login-gate-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .login-gate-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; }
+    .login-gate-sub { font-size: 0.88rem; color: #555; margin-bottom: 22px; }
+    .lgi-field { margin-bottom: 12px; text-align: left; }
+    .lgi-field label { display: block; font-size: 0.8rem; color: #666; margin-bottom: 4px; }
+    .lgi-field input { width: 100%; padding: 9px 12px; border: 1px solid #d0d0d0; border-radius: 7px; font-size: 0.9rem; outline: none; }
+    .lgi-field input:focus { border-color: #1a1a1a; }
+    .btn-admin-login { width: 100%; padding: 11px; background: #1a1a1a; color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+
+    /* ── TOAST ── */
+    .toast { position: fixed; bottom: 28px; right: 28px; background: #1a1a1a; color: #fff; padding: 12px 22px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; opacity: 0; transform: translateY(12px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 1000; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── TABS ── */
+    .tab-bar { display: flex; gap: 0; border-bottom: 2px solid #f0f0f0; }
+    .tab { padding: 12px 20px; font-size: 0.88rem; font-weight: 600; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: color 0.15s; }
+    .tab:hover { color: #1a1a1a; }
+    .tab.active { color: #1a1a1a; border-bottom-color: #1a1a1a; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- ══ LOGIN GATE ══ -->
+<div class="login-gate visible" id="loginGate">
+  <div class="login-gate-box">
+    <div class="login-gate-icon">🔐</div>
+    <div class="login-gate-title">Espace Administration</div>
+    <div class="login-gate-sub">Accès réservé aux modérateurs Mercato Nova.</div>
+    <div class="lgi-field">
+      <label>Identifiant admin</label>
+      <input type="text" id="adminLogin" placeholder="admin" />
+    </div>
+    <div class="lgi-field">
+      <label>Mot de passe</label>
+      <input type="password" id="adminPass" placeholder="••••••" onkeydown="if(event.key==='Enter')checkAdmin()" />
+    </div>
+    <button class="btn-admin-login" onclick="checkAdmin()">Accéder au panneau →</button>
+    <div style="margin-top:14px;font-size:0.75rem;color:#aaa">Compte démo : <strong>admin</strong> / <strong>admin2026</strong></div>
+  </div>
+</div>
+
+<!-- ══ LAYOUT ══ -->
+<div class="layout" id="appLayout" style="display:none">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      ♪ MERCATO NOVA
+      <small>Administration</small>
+    </div>
+    <div class="sidebar-menu">
+      <div class="menu-item active" onclick="showTab('dashboard')"><span class="menu-icon">📊</span> Tableau de bord</div>
+      <div class="menu-item" onclick="showTab('users')"><span class="menu-icon">👥</span> Utilisateurs</div>
+      <div class="menu-item" onclick="showTab('annonces')"><span class="menu-icon">📋</span> Annonces</div>
+      <div class="menu-item" onclick="showTab('transactions')"><span class="menu-icon">💳</span> Transactions</div>
+    </div>
+    <div class="sidebar-footer">
+      <a href="Index_mercato_nova.html">← Retour au site</a>
+      <a href="#" onclick="logout()">Se déconnecter</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Tableau de bord</div>
+      <div class="topbar-user">
+        <span class="admin-badge">ADMIN</span>
+        <span id="adminName">Administrateur</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div id="tab-dashboard" class="tab-panel active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Utilisateurs</span>
+              <span class="stat-card-icon">👥</span>
+            </div>
+            <div class="stat-card-value" id="dStatUsers">0</div>
+            <div class="stat-card-sub">comptes enregistrés</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Annonces</span>
+              <span class="stat-card-icon">📋</span>
+            </div>
+            <div class="stat-card-value" id="dStatAnnonces">0</div>
+            <div class="stat-card-sub">publiées</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Enchères</span>
+              <span class="stat-card-icon">🔨</span>
+            </div>
+            <div class="stat-card-value" id="dStatEncheres">4</div>
+            <div class="stat-card-sub">en cours</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <span class="stat-card-label">Signalements</span>
+              <span class="stat-card-icon">🚨</span>
+            </div>
+            <div class="stat-card-value" id="dStatSignal">0</div>
+            <div class="stat-card-sub">en attente</div>
+          </div>
+        </div>
+
+        <!-- Activité récente -->
+        <div class="section">
+          <div class="section-header"><div class="section-title">Activité récente</div></div>
+          <table class="data-table">
+            <thead><tr><th>Événement</th><th>Détail</th><th>Date</th><th>Statut</th></tr></thead>
+            <tbody id="activityLog"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── UTILISATEURS ── -->
+      <div id="tab-users" class="tab-panel">
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">Gestion des utilisateurs</div>
+            <input class="section-search" type="text" placeholder="Rechercher un utilisateur..." oninput="renderUsers(this.value)" />
+          </div>
+          <div id="usersTableWrapper"></div>
+        </div>
+      </div>
+
+      <!-- ── ANNONCES ── -->
+      <div id="tab-annonces" class="tab-panel">
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">Modération des annonces</div>
+            <input class="section-search" type="text" placeholder="Rechercher une annonce..." oninput="renderAnnonces(this.value)" />
+          </div>
+          <div id="annoncesTableWrapper"></div>
+        </div>
+      </div>
+
+      <!-- ── TRANSACTIONS ── -->
+      <div id="tab-transactions" class="tab-panel">
+        <div class="section">
+          <div class="section-header"><div class="section-title">Transactions simulées</div></div>
+          <table class="data-table">
+            <thead><tr><th>ID</th><th>Article</th><th>Type</th><th>Montant</th><th>Date</th><th>Statut</th></tr></thead>
+            <tbody id="transactionsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ═══════════════════════════
+     AUTH ADMIN
+  ═══════════════════════════ */
+  const ADMIN_CREDS = { login: 'admin', password: 'admin2026' };
+
+  function checkAdmin() {
+    const login = document.getElementById('adminLogin').value.trim();
+    const pass  = document.getElementById('adminPass').value;
+    if (login === ADMIN_CREDS.login && pass === ADMIN_CREDS.password) {
+      document.getElementById('loginGate').classList.remove('visible');
+      document.getElementById('appLayout').style.display = 'flex';
+      document.getElementById('adminName').textContent = 'Admin';
+      initDashboard();
+    } else {
+      showToast('Identifiants incorrects.');
+    }
+  }
+
+  function logout() {
+    document.getElementById('appLayout').style.display = 'none';
+    document.getElementById('loginGate').classList.add('visible');
+    document.getElementById('adminLogin').value = '';
+    document.getElementById('adminPass').value = '';
+  }
+
+  /* ═══════════════════════════
+     TABS
+  ═══════════════════════════ */
+  const TAB_TITLES = {
+    dashboard: 'Tableau de bord',
+    users: 'Utilisateurs',
+    annonces: 'Annonces',
+    transactions: 'Transactions',
+  };
+
+  function showTab(name) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.querySelector(`.menu-item[onclick="showTab('${name}')"]`).classList.add('active');
+    document.getElementById('topbarTitle').textContent = TAB_TITLES[name];
+
+    if (name === 'users')        renderUsers('');
+    if (name === 'annonces')     renderAnnonces('');
+    if (name === 'transactions') renderTransactions();
+  }
+
+  /* ═══════════════════════════
+     DATA
+  ═══════════════════════════ */
+  function getUsers() {
+    const users = JSON.parse(localStorage.getItem('mn_users') || '[]');
+    if (!users.find(u => u.email === 'vinyl75@exemple.com')) {
+      users.push({ pseudo: 'VinylCollector75', email: 'vinyl75@exemple.com', password: 'vinyl2025', blocked: false });
+    }
+    return users;
+  }
+
+  function getAnnonces() {
+    return JSON.parse(localStorage.getItem('mn_annonces') || '[]');
+  }
+
+  /* ═══════════════════════════
+     DASHBOARD
+  ═══════════════════════════ */
+  function initDashboard() {
+    const users    = getUsers();
+    const annonces = getAnnonces();
+    document.getElementById('dStatUsers').textContent    = users.length;
+    document.getElementById('dStatAnnonces').textContent = annonces.length;
+    document.getElementById('dStatSignal').textContent   = annonces.filter(a => a.flagged).length;
+
+    const events = [
+      { icon:'🆕', event:'Inscription', detail:'VinylCollector75', date:'Aujourd\'hui', status:'bp-green', label:'Actif' },
+      { icon:'📋', event:'Annonce publiée', detail:'Abbey Road — Beatles', date:'Aujourd\'hui', status:'bp-blue', label:'Active' },
+      { icon:'🔨', event:'Enchère placée', detail:'Kind of Blue — 85 €', date:'Il y a 5 min', status:'bp-amber', label:'En cours' },
+      { icon:'💬', event:'Négociation ouverte', detail:'Casque Sennheiser', date:'Il y a 1h', status:'bp-blue', label:'En cours' },
+    ];
+
+    document.getElementById('activityLog').innerHTML = events.map(e => `
+      <tr>
+        <td>${e.icon} ${e.event}</td>
+        <td style="color:#555">${e.detail}</td>
+        <td style="color:#888;font-size:0.82rem">${e.date}</td>
+        <td><span class="badge-pill ${e.status}">${e.label}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  /* ═══════════════════════════
+     USERS TABLE
+  ═══════════════════════════ */
+  function renderUsers(search = '') {
+    const users = getUsers().filter(u =>
+      !search || u.pseudo.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
+    );
+    const wrapper = document.getElementById('usersTableWrapper');
+
+    if (!users.length) {
+      wrapper.innerHTML = '<div class="table-empty">Aucun utilisateur trouvé.</div>';
+      return;
+    }
+
+    wrapper.innerHTML = `
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Pseudo</th>
+            <th>Email</th>
+            <th>Statut</th>
+            <th>Rôle</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${users.map((u, i) => `
+            <tr>
+              <td><strong>${u.pseudo}</strong></td>
+              <td style="color:#555">${u.email}</td>
+              <td><span class="badge-pill ${u.blocked ? 'bp-red' : 'bp-green'}">${u.blocked ? 'Bloqué' : 'Actif'}</span></td>
+              <td><span class="badge-pill bp-gray">${u.email === 'admin@mercatonova.fr' ? 'Admin' : 'Membre'}</span></td>
+              <td>
+                <div class="actions-cell">
+                  <button class="action-btn ${u.blocked ? 'ab-unblock' : 'ab-block'}" onclick="toggleBlock(${i})">
+                    ${u.blocked ? 'Débloquer' : 'Bloquer'}
+                  </button>
+                  <button class="action-btn ab-delete" onclick="deleteUser(${i})">Supprimer</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function toggleBlock(idx) {
+    const users = getUsers();
+    users[idx].blocked = !users[idx].blocked;
+    localStorage.setItem('mn_users', JSON.stringify(users));
+    renderUsers('');
+    showToast(users[idx].blocked ? 'Utilisateur bloqué.' : 'Utilisateur débloqué.');
+    document.getElementById('dStatUsers').textContent = users.length;
+  }
+
+  function deleteUser(idx) {
+    if (!confirm('Supprimer cet utilisateur ?')) return;
+    const users = getUsers();
+    users.splice(idx, 1);
+    localStorage.setItem('mn_users', JSON.stringify(users));
+    renderUsers('');
+    showToast('Utilisateur supprimé.');
+    document.getElementById('dStatUsers').textContent = users.length;
+  }
+
+  /* ═══════════════════════════
+     ANNONCES TABLE
+  ═══════════════════════════ */
+  const TYPE_LABEL = { achat:'Achat', enchere:'Enchère', nego:'Négo' };
+  const TYPE_CLASS = { achat:'bp-black', enchere:'bp-amber', nego:'bp-green' };
+
+  function renderAnnonces(search = '') {
+    const list = getAnnonces().filter(a =>
+      !search || a.titre.toLowerCase().includes(search.toLowerCase())
+    );
+    const wrapper = document.getElementById('annoncesTableWrapper');
+
+    if (!list.length) {
+      wrapper.innerHTML = '<div class="table-empty">Aucune annonce publiée pour l\'instant.</div>';
+      return;
+    }
+
+    wrapper.innerHTML = `
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Titre</th>
+            <th>Catégorie</th>
+            <th>Type</th>
+            <th>Prix</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map((a, i) => `
+            <tr>
+              <td><strong>${a.titre}</strong></td>
+              <td style="color:#555">${a.cat || '—'}</td>
+              <td><span class="badge-pill ${TYPE_CLASS[a.type] || 'bp-gray'}">${TYPE_LABEL[a.type] || a.type}</span></td>
+              <td><strong>${a.prix} €</strong></td>
+              <td style="color:#888;font-size:0.82rem">${a.createdAt || '—'}</td>
+              <td><span class="badge-pill ${a.flagged ? 'bp-red' : 'bp-green'}">${a.flagged ? 'Signalée' : 'Active'}</span></td>
+              <td>
+                <div class="actions-cell">
+                  <button class="action-btn ${a.flagged ? 'ab-approve' : 'ab-block'}" onclick="toggleFlag(${i})">
+                    ${a.flagged ? 'Valider' : 'Signaler'}
+                  </button>
+                  <button class="action-btn ab-delete" onclick="deleteAnnonce(${i})">Supprimer</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function toggleFlag(idx) {
+    const list = getAnnonces();
+    list[idx].flagged = !list[idx].flagged;
+    localStorage.setItem('mn_annonces', JSON.stringify(list));
+    renderAnnonces('');
+    document.getElementById('dStatSignal').textContent = list.filter(a => a.flagged).length;
+    showToast(list[idx].flagged ? 'Annonce signalée.' : 'Annonce validée.');
+  }
+
+  function deleteAnnonce(idx) {
+    if (!confirm('Supprimer définitivement cette annonce ?')) return;
+    const list = getAnnonces();
+    list.splice(idx, 1);
+    localStorage.setItem('mn_annonces', JSON.stringify(list));
+    renderAnnonces('');
+    document.getElementById('dStatAnnonces').textContent = list.length;
+    showToast('Annonce supprimée.');
+  }
+
+  /* ═══════════════════════════
+     TRANSACTIONS
+  ═══════════════════════════ */
+  function renderTransactions() {
+    const transactions = [
+      { id:'MN-A1B2', article:'Abbey Road — Beatles', type:'Enchère', montant:'85 €', date:'Aujourd\'hui', status:'bp-green', label:'Confirmée' },
+      { id:'MN-C3D4', article:'Daft Punk — RAM',       type:'Achat', montant:'35 €', date:'Hier', status:'bp-green', label:'Confirmée' },
+      { id:'MN-E5F6', article:'Casque Sennheiser HD600', type:'Négo', montant:'160 €', date:'Il y a 2j', status:'bp-amber', label:'En attente' },
+      { id:'MN-G7H8', article:'Ampli Marantz 2270',    type:'Enchère', montant:'550 €', date:'Il y a 3j', status:'bp-red', label:'Annulée' },
+    ];
+
+    document.getElementById('transactionsBody').innerHTML = transactions.map(t => `
+      <tr>
+        <td style="font-family:monospace;color:#888">${t.id}</td>
+        <td><strong>${t.article}</strong></td>
+        <td><span class="badge-pill bp-gray">${t.type}</span></td>
+        <td><strong>${t.montant}</strong></td>
+        <td style="color:#888;font-size:0.82rem">${t.date}</td>
+        <td><span class="badge-pill ${t.status}">${t.label}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  /* ═══════════════════════════
+     TOAST
+  ═══════════════════════════ */
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+
+</body>
+</html>
