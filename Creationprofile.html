@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion / Inscription — Mercato Nova</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 1.3rem; font-weight: 800; letter-spacing: 0.5px;
+      color: #1a1a1a; text-decoration: none;
+    }
+    .logo span { font-size: 1.4rem; }
+
+    /* ── MAIN ── */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .auth-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .auth-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #1a1a1a;
+    }
+
+    .auth-subtitle {
+      font-size: 0.92rem;
+      color: #777;
+      margin-bottom: 28px;
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #eee;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #999;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .tab-btn.active {
+      color: #1a1a1a;
+      border-bottom-color: #5b8dee;
+    }
+
+    /* ── FORMS ── */
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+      background: #fafafa;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #5b8dee;
+      background: #fff;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      background: #5b8dee;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover { background: #3a6fd8; }
+    .btn-primary:disabled { background: #aaa; cursor: not-allowed; }
+
+    .error-msg {
+      background: #fff0f0;
+      color: #c0392b;
+      border: 1px solid #f5c6cb;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .success-msg {
+      background: #f0fff4;
+      color: #27ae60;
+      border: 1px solid #b7e4c7;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .role-hint {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    /* ── Demo creds ── */
+    .demo-box {
+      background: #f0f6ff;
+      border: 1px solid #c8deff;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 20px;
+      font-size: 0.82rem;
+      color: #555;
+    }
+
+    .demo-box strong { color: #3a6fd8; }
+
+    .demo-box .demo-fill {
+      display: inline-block;
+      margin-top: 4px;
+      color: #5b8dee;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index_mercatonova.html" class="logo">
+    <span>🛒</span> MERCATO NOVA
+  </a>
+</header>
+
+<main>
+  <div class="auth-card">
+
+    <div class="auth-title">Bienvenue sur Mercato Nova</div>
+    <div class="auth-subtitle">Connectez-vous ou créez votre compte pour continuer.</div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Connexion</button>
+      <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">Inscription</button>
+    </div>
+
+    <!-- ═══════════════ CONNEXION ═══════════════ -->
+    <div class="form-section active" id="sectionLogin">
+      <div class="error-msg" id="loginError"></div>
+      <div class="success-msg" id="loginSuccess"></div>
+
+      <div class="form-group">
+        <label for="loginEmail">Adresse email</label>
+        <input type="email" id="loginEmail" placeholder="votre@email.com" autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label for="loginPassword">Mot de passe</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <button class="btn-primary" id="btnLogin" onclick="handleLogin()">Se connecter</button>
+
+      <div class="demo-box">
+        <strong>Comptes de démonstration :</strong><br>
+        Admin : admin@mercatonova.fr / admin2025
+        <span class="demo-fill" onclick="fillDemo('admin@mercatonova.fr','admin2025')">→ Remplir</span><br>
+        Vendeur : vinyl75@exemple.com / vinyl2025
+        <span class="demo-fill" onclick="fillDemo('vinyl75@exemple.com','vinyl2025')">→ Remplir</span><br>
+        Client : client@exemple.com / demo1234
+        <span class="demo-fill" onclick="fillDemo('client@exemple.com','demo1234')">→ Remplir</span>
+      </div>
+    </div>
+
+    <!-- ═══════════════ INSCRIPTION ═══════════════ -->
+    <div class="form-section" id="sectionRegister">
+      <div class="error-msg" id="registerError"></div>
+      <div class="success-msg" id="registerSuccess"></div>
+
+      <div class="form-group">
+        <label for="regPseudo">Pseudo</label>
+        <input type="text" id="regPseudo" placeholder="MonPseudo" autocomplete="username" />
+      </div>
+
+      <div class="form-group">
+        <label for="regEmail">Adresse email</label>
+        <input type="email" id="regEmail" placeholder="votre@email.com" autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label for="regPassword">Mot de passe <span style="font-weight:400;color:#aaa;">(6 caractères min.)</span></label>
+        <input type="password" id="regPassword" placeholder="••••••••" autocomplete="new-password" />
+      </div>
+
+      <div class="form-group">
+        <label for="regRole">Type de compte</label>
+        <select id="regRole">
+          <option value="client">Client — j'achète des produits</option>
+          <option value="vendeur">Vendeur — je vends des produits</option>
+        </select>
+        <div class="role-hint">Vous pourrez acheter quel que soit votre rôle.</div>
+      </div>
+
+      <button class="btn-primary" id="btnRegister" onclick="handleRegister()">Créer mon compte</button>
+    </div>
+
+  </div>
+</main>
+
+<script src="api-client.js"></script>
+<script>
+  /* ── Rediriger si déjà connecté ── */
+  (async function checkAlreadyLoggedIn() {
+    try {
+      const user = await Auth.me();
+      if (user) redirectAfterLogin(user);
+    } catch {
+      // Pas connecté, rester sur la page
+    }
+  })();
+
+  /* ── TABS ── */
+  function switchTab(tab) {
+    document.getElementById('sectionLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('sectionRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+    hideErrors();
+  }
+
+  function hideErrors() {
+    ['loginError','loginSuccess','registerError','registerSuccess'].forEach(id => {
+      document.getElementById(id).style.display = 'none';
+    });
+  }
+
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function showSuccess(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  /* ── CONNEXION ── */
+  async function handleLogin() {
+    hideErrors();
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email || !password) {
+      showError('loginError', 'Veuillez remplir tous les champs.');
+      return;
+    }
+
+    const btn = document.getElementById('btnLogin');
+    btn.disabled = true;
+    btn.textContent = 'Connexion…';
+
+    try {
+      const user = await Auth.login(email, password);
+      showSuccess('loginSuccess', `Bienvenue, ${user.pseudo} ! Redirection…`);
+      setTimeout(() => redirectAfterLogin(user), 800);
+    } catch (err) {
+      showError('loginError', err.message || 'Identifiants incorrects.');
+      btn.disabled = false;
+      btn.textContent = 'Se connecter';
+    }
+  }
+
+  /* ── INSCRIPTION ── */
+  async function handleRegister() {
+    hideErrors();
+    const pseudo   = document.getElementById('regPseudo').value.trim();
+    const email    = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const role     = document.getElementById('regRole').value;
+
+    if (!pseudo || !email || !password) {
+      showError('registerError', 'Veuillez remplir tous les champs.');
+      return;
+    }
+
+    const btn = document.getElementById('btnRegister');
+    btn.disabled = true;
+    btn.textContent = 'Création…';
+
+    try {
+      const user = await Auth.register(pseudo, email, password, role);
+      showSuccess('registerSuccess', `Compte créé ! Bienvenue, ${user.pseudo} ! Redirection…`);
+      setTimeout(() => redirectAfterLogin(user), 800);
+    } catch (err) {
+      showError('registerError', err.message || 'Erreur lors de la création du compte.');
+      btn.disabled = false;
+      btn.textContent = 'Créer mon compte';
+    }
+  }
+
+  /* ── REDIRECTION SELON RÔLE ── */
+  function redirectAfterLogin(user) {
+    const returnTo = new URLSearchParams(window.location.search).get('returnTo');
+    if (returnTo) {
+      window.location.href = decodeURIComponent(returnTo);
+      return;
+    }
+    if (user.role === 'admin') {
+      window.location.href = 'admin.html';
+    } else {
+      window.location.href = 'index_mercatonova.html';
+    }
+  }
+
+  /* ── REMPLIR DÉMO ── */
+  function fillDemo(email, pass) {
+    document.getElementById('loginEmail').value = email;
+    document.getElementById('loginPassword').value = pass;
+    switchTab('login');
+  }
+
+  /* ── ENTER pour soumettre ── */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      const loginActive = document.getElementById('sectionLogin').classList.contains('active');
+      if (loginActive) handleLogin();
+      else handleRegister();
+    }
+  });
+</script>
+
+</body>
+</html>

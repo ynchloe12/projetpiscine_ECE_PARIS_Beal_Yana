@@ -225,8 +225,8 @@
     <div class="login-gate-title">Espace Administration</div>
     <div class="login-gate-sub">Accès réservé aux modérateurs Mercato Nova.</div>
     <div class="lgi-field">
-      <label>Identifiant admin</label>
-      <input type="text" id="adminLogin" placeholder="admin" />
+      <label>Email admin</label>
+      <input type="email" id="adminLogin" placeholder="admin@mercatonova.fr" />
     </div>
     <div class="lgi-field">
       <label>Mot de passe</label>
@@ -358,29 +358,60 @@
 
 <script>
   /* ═══════════════════════════
-     AUTH ADMIN
+     AUTH ADMIN (via API PHP)
   ═══════════════════════════ */
-  const ADMIN_CREDS = { login: 'admin', password: 'admin2026' };
 
-  function checkAdmin() {
-    const login = document.getElementById('adminLogin').value.trim();
+  async function checkAdmin() {
+    const email = document.getElementById('adminLogin').value.trim();
     const pass  = document.getElementById('adminPass').value;
-    if (login === ADMIN_CREDS.login && pass === ADMIN_CREDS.password) {
+    if (!email || !pass) { showToast('Remplissez email et mot de passe.'); return; }
+
+    try {
+      const res = await fetch('/mercato_nova/api/index.php?route=auth%2Flogin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password: pass }),
+      });
+      const json = await res.json();
+      if (!json.success) { showToast(json.error || 'Identifiants incorrects.'); return; }
+      const user = json.data;
+      if (user.role !== 'admin') { showToast('Accès refusé : compte non-administrateur.'); return; }
+
       document.getElementById('loginGate').classList.remove('visible');
       document.getElementById('appLayout').style.display = 'flex';
-      document.getElementById('adminName').textContent = 'Admin';
+      document.getElementById('adminName').textContent = user.pseudo || 'Admin';
       initDashboard();
-    } else {
-      showToast('Identifiants incorrects.');
+    } catch (err) {
+      showToast('Erreur réseau. Vérifiez que WAMP est démarré.');
     }
   }
 
-  function logout() {
+  async function logout() {
+    try {
+      await fetch('/mercato_nova/api/index.php?route=auth%2Flogout', {
+        method: 'POST', credentials: 'include',
+      });
+    } catch {}
     document.getElementById('appLayout').style.display = 'none';
     document.getElementById('loginGate').classList.add('visible');
     document.getElementById('adminLogin').value = '';
     document.getElementById('adminPass').value = '';
   }
+
+  /* Auto-login si déjà connecté en admin */
+  (async function autoLoginAdmin() {
+    try {
+      const res = await fetch('/mercato_nova/api/index.php?route=auth%2Fme', { credentials: 'include' });
+      const json = await res.json();
+      if (json.success && json.data && json.data.role === 'admin') {
+        document.getElementById('loginGate').classList.remove('visible');
+        document.getElementById('appLayout').style.display = 'flex';
+        document.getElementById('adminName').textContent = json.data.pseudo || 'Admin';
+        initDashboard();
+      }
+    } catch {}
+  })();
 
   /* ═══════════════════════════
      TABS

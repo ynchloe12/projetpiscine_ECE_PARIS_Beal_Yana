@@ -603,6 +603,7 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="api-client.js"></script>
 <script>
   /* ── ÉTAT ── */
   let editMode = false;
@@ -610,19 +611,17 @@
   let currentUser = null;
 
   /* ── INITIALISATION ── */
-  function initPage() {
-    currentUser = JSON.parse(localStorage.getItem('mn_currentUser') || 'null');
-
-    if (!currentUser) {
-      window.location.href = 'Creationprofile.html';
-      return;
+  async function initPage() {
+    // Vérification session via l'API (pas localStorage)
+    try {
+      currentUser = await Auth.me();
+    } catch {
+      currentUser = null;
     }
 
-    // Pré-insère le compte de démo si absent
-    const users = JSON.parse(localStorage.getItem('mn_users') || '[]');
-    if (!users.find(u => u.email === 'vinyl75@exemple.com')) {
-      users.push({ pseudo: 'VinylCollector75', email: 'vinyl75@exemple.com', password: 'vinyl2025' });
-      localStorage.setItem('mn_users', JSON.stringify(users));
+    if (!currentUser) {
+      window.location.href = 'Creationprofile.html?returnTo=' + encodeURIComponent(window.location.pathname + window.location.search);
+      return;
     }
 
     // Remplir les données de l'utilisateur connecté
@@ -642,55 +641,64 @@
     wrapper.addEventListener('click', () => document.getElementById('avatarInput').click());
 
     renderArticles();
+    updateCartBadge();
   }
 
-  /* ── MES ANNONCES ── */
-  function renderArticles() {
+  /* ── MES ANNONCES (via API) ── */
+  async function renderArticles() {
     const grid = document.getElementById('articlesGrid');
-    const annonces = JSON.parse(localStorage.getItem('mn_annonces') || '[]');
-    const mesAnnonces = annonces.filter(a =>
-      a.vendeur === currentUser.pseudo ||
-      a.vendeur === currentUser.email ||
-      !a.vendeur
-    );
+    grid.innerHTML = '<div style="color:#aaa;padding:16px;">Chargement…</div>';
 
-    if (!mesAnnonces.length) {
-      grid.innerHTML = `
-        <div class="empty-articles">
-          <div class="empty-icon">📦</div>
-          Vous n'avez aucune annonce en cours.<br>
-          <a href="creation_annonce.html" style="color:#5b8dee;font-weight:700;">Créer une annonce</a>
-        </div>`;
-      return;
+    try {
+      const annonces = await Annonces.mesAnnonces();
+
+      if (!annonces || !annonces.length) {
+        grid.innerHTML = `
+          <div class="empty-articles">
+            <div class="empty-icon">📦</div>
+            Vous n'avez aucune annonce en cours.<br>
+            <a href="creation_annonce.html" style="color:#5b8dee;font-weight:700;">Créer une annonce</a>
+          </div>`;
+        return;
+      }
+
+      const badgeClass = { enchere: 'badge-enchere', achat: 'badge-achat', nego: 'badge-nego' };
+      const badgeLabel = { enchere: 'Enchère', achat: 'Achat direct', nego: 'Négociation' };
+
+      grid.innerHTML = annonces.map(a => `
+        <div class="article-card">
+          <div class="article-img-wrapper" style="background:#e8e8e8">
+            ${a.photo_url ? `<img class="article-img" src="${a.photo_url}" alt="${escHtml(a.titre)}" onerror="this.style.display='none'" />` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2rem;">🎵</div>'}
+          </div>
+          <div class="article-body">
+            <div class="article-name">${escHtml(a.titre)}</div>
+            <div class="article-price">${parseFloat(a.prix).toFixed(2)} €</div>
+            <span class="article-badge ${badgeClass[a.type] || 'badge-achat'}">${badgeLabel[a.type] || 'Achat direct'}</span>
+          </div>
+        </div>
+      `).join('');
+    } catch (err) {
+      grid.innerHTML = '<div style="color:#c0392b;padding:16px;">Impossible de charger les annonces.</div>';
     }
+  }
 
-    const badgeClass = { enchere: 'badge-enchere', achat: 'badge-achat', nego: 'badge-nego' };
-    const badgeLabel = { enchere: 'Enchère', achat: 'Achat direct', nego: 'Négociation' };
-
-    grid.innerHTML = mesAnnonces.map(a => `
-      <div class="article-card">
-        <div class="article-img-wrapper" style="background:#e8e8e8">
-          ${a.photo ? `<img class="article-img" src="${a.photo}" alt="${a.titre}" onerror="this.style.display='none'" />` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2rem;">🎵</div>'}
-        </div>
-        <div class="article-body">
-          <div class="article-name">${a.titre}</div>
-          <div class="article-price">${a.prix} €</div>
-          <span class="article-badge ${badgeClass[a.type] || 'badge-achat'}">${badgeLabel[a.type] || 'Achat direct'}</span>
-        </div>
-      </div>
-    `).join('');
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   /* ── DÉCONNEXION ── */
-  function logout() {
-    localStorage.removeItem('mn_currentUser');
-    showToast('Déconnecté avec succès.');
-    setTimeout(() => window.location.href = 'Creationprofile.html', 1200);
+  async function logout() {
+    try {
+      await Auth.logout(); // redirige automatiquement vers Creationprofile.html
+    } catch {
+      localStorage.removeItem('mn_currentUser');
+      window.location.href = 'Creationprofile.html';
+    }
   }
 
   /* ── NAVIGATION ── */
   function goToProfile() {
-    window.location.href = 'Creationprofile.html';
+    window.location.href = 'profil_utilisateur.html';
   }
 
   /* ── PHOTO DE PROFIL ── */
@@ -726,44 +734,47 @@
 
     if (!editMode) {
       pendingAvatarFile = null;
-      // Restaurer les valeurs originales si annulation
       document.getElementById('inputPseudo').value = currentUser.pseudo || '';
       document.getElementById('inputEmail').value = currentUser.email || '';
       document.getElementById('inputAdresse').value = currentUser.adresse || '';
+      document.getElementById('inputMdp').value = '';
     }
   }
 
-  /* ── SAUVEGARDE ── */
-  function saveProfile() {
-    const pseudo = document.getElementById('inputPseudo').value.trim();
-    const email = document.getElementById('inputEmail').value.trim();
+  /* ── SAUVEGARDE (via API) ── */
+  async function saveProfile() {
+    const pseudo  = document.getElementById('inputPseudo').value.trim();
+    const email   = document.getElementById('inputEmail').value.trim();
     const adresse = document.getElementById('inputAdresse').value.trim();
-    const mdp = document.getElementById('inputMdp').value.trim();
+    const mdp     = document.getElementById('inputMdp').value.trim();
 
     if (!pseudo) { showToast('Le pseudo ne peut pas être vide.'); return; }
 
-    // Mettre à jour currentUser
-    currentUser.pseudo = pseudo;
-    currentUser.email = email;
-    if (adresse) currentUser.adresse = adresse;
-    if (mdp) currentUser.password = mdp;
+    const btn = document.getElementById('btnSave');
+    btn.disabled = true;
+    btn.textContent = 'Enregistrement…';
 
-    // Mettre à jour dans mn_users
-    const users = JSON.parse(localStorage.getItem('mn_users') || '[]');
-    const idx = users.findIndex(u => u.email === currentUser.email || u.pseudo === currentUser.pseudo);
-    if (idx !== -1) {
-      users[idx] = { ...users[idx], pseudo, email, adresse, ...(mdp ? { password: mdp } : {}) };
-    } else {
-      users.push(currentUser);
+    try {
+      const payload = { pseudo, email, adresse };
+      if (mdp) payload.password = mdp;
+
+      const updated = await Users.updateProfile(payload);
+
+      // Mettre à jour l'état local et le localStorage (compatibilité)
+      currentUser = { ...currentUser, ...updated };
+      localStorage.setItem('mn_currentUser', JSON.stringify(currentUser));
+
+      document.getElementById('displayUsername').textContent = currentUser.pseudo;
+      document.getElementById('inputMdp').value = '';
+      pendingAvatarFile = null;
+      toggleEdit();
+      showToast('Profil enregistré !');
+    } catch (err) {
+      showToast('Erreur : ' + (err.message || 'Impossible de sauvegarder.'));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Enregistrer';
     }
-    localStorage.setItem('mn_users', JSON.stringify(users));
-    localStorage.setItem('mn_currentUser', JSON.stringify(currentUser));
-
-    document.getElementById('displayUsername').textContent = pseudo;
-    document.getElementById('inputMdp').value = '';
-    pendingAvatarFile = null;
-    toggleEdit();
-    showToast('Profil enregistré !');
   }
 
   /* ── TOAST ── */
@@ -786,16 +797,22 @@
     }
   });
 
-  function updateCartBadge() {
-    const cart = JSON.parse(localStorage.getItem('mn_cart') || '[]');
-    const total = cart.reduce((s, i) => s + i.qty, 0);
-    const badge = document.getElementById('cartBadge');
-    badge.textContent = total;
-    badge.style.display = total > 0 ? 'flex' : 'none';
+  /* ── PANIER BADGE (depuis l'API) ── */
+  async function updateCartBadge() {
+    try {
+      const items = await Panier.get();
+      const total = items ? items.reduce((s, i) => s + (i.quantite || 1), 0) : 0;
+      const badge = document.getElementById('cartBadge');
+      if (badge) {
+        badge.textContent = total;
+        badge.style.display = total > 0 ? 'flex' : 'none';
+      }
+    } catch {
+      // Pas connecté ou erreur, badge reste à 0
+    }
   }
 
   initPage();
-  updateCartBadge();
 </script>
 
 </body>
