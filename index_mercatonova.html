@@ -87,6 +87,7 @@
     }
 
     nav a:hover { background: #f0f0f0; }
+    nav a.active { font-weight: 700; background: #f0f0f0; }
 
     .nav-icons {
       display: flex;
@@ -308,6 +309,7 @@
   </div>
 
   <nav>
+    <a href="index_mercatonova.html" class="active">Accueil</a>
     <a href="catalogue.html">Catalogue</a>
     <a href="encheres.html">Enchères</a>
     <a href="creation_annonce.html">Mes annonces</a>
@@ -388,17 +390,17 @@
 <script>
   /* ── DATA ── */
   const encheres = [
-    { id: 1, name: "Abbey Road — 1ère press.",  img: "Abbey_Road.jpeg",    bg: "#e8d5b7", price: 85,  timer: "02:14:30" },
-    { id: 2, name: "Platine Technics SL-1200",  img: "Platine Technics SL-1200.jpeg", bg: "#d0d0d0", price: 320, timer: "00:45:12" },
-    { id: 3, name: "Kind of Blue — Miles Davis",img: "kind-of-blue.jpeg",  bg: "#c8daf0", price: 45,  timer: "05:00:00" },
-    { id: 4, name: "Ampli Marantz 2270",         img: "marantz-2270.jpg",  bg: "#e0d0c0", price: 550, timer: "01:20:00" },
+    { id: 1,  name: "Abbey Road — Beatles",       img: "Abbey_Road.jpeg",                 bg: "#e8d5b7", price: 85,  timer: "02:14:30" },
+    { id: 4,  name: "Kind of Blue — Miles Davis", img: "kind-of-blue.jpeg",               bg: "#c8daf0", price: 45,  timer: "05:00:00" },
+    { id: 7,  name: "Ampli Marantz 2270",         img: "marantz-2270.jpg",                bg: "#e0d0c0", price: 550, timer: "01:20:00" },
+    { id: 10, name: "Kind of Blue — 1ère press.", img: "kind-of-blue.jpeg",               bg: "#d0e0f0", price: 210, timer: "03:30:00" },
   ];
 
   const recents = [
-    { id: 5, name: "Daft Punk — RAM",         img: "daft-punk-ram.jpeg",      bg: "#d5d5e8", price: 35,  type: "achat" },
-    { id: 6, name: "Casque Sennheiser HD600",  img: "sennheiser-hd600.jpg",   bg: "#d0d0d0", price: 180, type: "nego"  },
-    { id: 7, name: "Lot 20 vinyles Jazz",      img: "vinyles-jazz.webp",       bg: "#fce4b0", price: 60,  type: "nego"  },
-    { id: 8, name: "Enceintes JBL L100",       img: "jbl-l100.png",           bg: "#c8d8c8", price: 450, type: "achat" },
+    { id: 2, name: "Daft Punk — RAM",          img: "daft-punk-ram.jpeg",    bg: "#d5d5e8", price: 35,  type: "achat" },
+    { id: 5, name: "Casque Sennheiser HD600",   img: "sennheiser-hd600.jpg", bg: "#d0d0d0", price: 180, type: "nego"  },
+    { id: 6, name: "Lot Jazz vinyles",          img: "vinyles-jazz.webp",    bg: "#fce4b0", price: 60,  type: "achat" },
+    { id: 8, name: "Enceintes JBL L100",        img: "jbl-l100.png",         bg: "#c8d8c8", price: 450, type: "achat" },
   ];
 
   const categories = ["Vinyles","CD","Platines","Amplis","Enceintes","Casques","Accessoires"];

@@ -281,7 +281,13 @@
   (async function checkAlreadyLoggedIn() {
     try {
       const user = await Auth.me();
-      if (user) redirectAfterLogin(user);
+      if (user) {
+        if (user.role === 'admin') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'profil_utilisateur.html';
+        }
+      }
     } catch {
       // Pas connecté, rester sur la page
     }

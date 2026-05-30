@@ -1,0 +1,33 @@
+# .htaccess — Mercato Nova
+# Placer ce fichier à la RACINE du dossier du projet (www/mercato_nova/)
+# WAMP doit avoir mod_rewrite activé (coché dans le menu Wamp > Apache > modules)
+
+Options -Indexes
+DirectoryIndex index_mercatonova.html
+
+# ── CORS globaux (développement) ─────────────────────────────
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type"
+</IfModule>
+
+# ── Réécriture (optionnel — non obligatoire car on utilise ?route=) ──
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /mercato_nova/
+
+    # Préflights OPTIONS
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule .* - [R=204,L]
+</IfModule>
+
+# ── Sécurité minimale ────────────────────────────────────────
+<Files "*.php">
+    # Autorise l'accès aux fichiers PHP dans api/
+</Files>
+
+# Protège les fichiers de config
+<FilesMatch "^(db\.php|auth\.php)$">
+    Require all denied
+</FilesMatch>
